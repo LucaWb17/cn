@@ -68,4 +68,9 @@ function is_admin() {
     return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 }
 
+// Email Configuration
+define('ADMIN_EMAIL', 'admin@example.com'); // Replace with your admin email
+define('FROM_EMAIL', 'noreply@example.com'); // Replace with your desired "From" email
+define('FROM_NAME', 'CN Auto Booking');     // Replace with your desired "From" name
+
 ?>

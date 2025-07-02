@@ -113,4 +113,45 @@ function format_time_display($time_str, $format = "h:i A") {
 
 // Add more utility functions as needed, e.g., for pagination, email sending, etc.
 
+// Function to send email using PHP's native mail() function
+function send_native_email($to, $subject, $html_message, $from_email, $from_name) {
+    // To send HTML mail, the Content-type header must be set
+    $headers  = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+    // More headers
+    $headers .= 'From: ' . $from_name . ' <' . $from_email . '>' . "\r\n";
+    // $headers .= 'Cc: myboss@example.com' . "\r\n"; // Optional CC
+    // $headers .= 'Bcc: mybackup@example.com' . "\r\n"; // Optional BCC
+
+    // Add some basic styling to the HTML message
+    $styled_message = "
+    <html>
+    <head>
+      <title>" . htmlspecialchars($subject) . "</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        h2 { color: #2c3e50; }
+        .footer { margin-top: 20px; font-size: 0.9em; text-align: center; color: #777; }
+      </style>
+    </head>
+    <body>
+      <div class='container'>
+        " . $html_message . "
+        <div class='footer'>
+          <p>This is an automated message from " . htmlspecialchars($from_name) . ".</p>
+        </div>
+      </div>
+    </body>
+    </html>";
+
+    if (mail($to, $subject, $styled_message, $headers)) {
+        return true;
+    } else {
+        // Basic error logging, actual delivery success is not guaranteed by mail() returning true.
+        error_log("Email sending failed using mail(): To: $to, Subject: $subject");
+        return false;
+    }
+}
 ?>
