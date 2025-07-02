@@ -10,14 +10,19 @@
 
     <title>Stitch Design</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
   <body>
+    <?php
+    require_once 'config.php'; // Defines BASE_URL, $mysqli, session_start()
+    require_once 'register.php'; // Contains the PHP logic for registration, defines error variables like $name_err
+    require_once 'utils/functions.php'; // For display_flash_message()
+    ?>
     <div class="relative flex size-full min-h-screen flex-col bg-[#221d11] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#483e23] px-10 py-3">
-          <div class="flex items-center gap-4 text-white">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#483e23] px-4 sm:px-10 py-3">
+          <a href="<?php echo BASE_URL . '/home.php'; ?>" class="flex items-center gap-4 text-white">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -26,70 +31,100 @@
                 ></path>
               </svg>
             </div>
-            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">AutoPro</h2>
-          </div>
-          <div class="flex flex-1 justify-end gap-8">
-            <div class="flex items-center gap-9">
-              <a class="text-white text-sm font-medium leading-normal" href="#">Services</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
-            </div>
-            <button
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#483e23] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
+          </a>
+          <div class="flex flex-1 justify-end items-center gap-2 sm:gap-8">
+            <nav class="hidden sm:flex items-center gap-9">
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="#">About</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="#">Contact</a>
+            </nav>
+            <a href="<?php echo BASE_URL . '/login.php'; ?>"
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#483e23] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5a4e2e]"
             >
               <span class="truncate">Log In</span>
-            </button>
+            </a>
           </div>
         </header>
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
+        <main class="px-4 sm:px-10 md:px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col w-full sm:w-[512px] max-w-[512px] py-5 flex-1">
             <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Create your account</h2>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Full Name"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Email"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Password"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Confirm Password"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex px-4 py-3">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 flex-1 bg-[#f4c653] text-[#221d11] text-sm font-bold leading-normal tracking-[0.015em]"
-              >
-                <span class="truncate">Create Account</span>
-              </button>
-            </div>
-            <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">Already have an account? Log in</p>
+
+            <?php
+            // Display general error from register.php if it exists
+            if(!empty($general_err)){
+                echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">' . $general_err . '</div>';
+            }
+            // Display flash messages from session (e.g., from other redirects)
+            echo display_flash_message();
+            ?>
+
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                  <label class="flex flex-col min-w-40 flex-1">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Full Name"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($name_err)) ? 'border-red-500' : ''; ?>"
+                      value="<?php echo isset($name) ? $name : ''; ?>"
+                    />
+                    <span class="text-red-500 text-xs italic pl-1 pt-1"><?php echo $name_err; ?></span>
+                  </label>
+                </div>
+                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                  <label class="flex flex-col min-w-40 flex-1">
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($email_err)) ? 'border-red-500' : ''; ?>"
+                      value="<?php echo isset($email) ? $email : ''; ?>"
+                    />
+                     <span class="text-red-500 text-xs italic pl-1 pt-1"><?php echo $email_err; ?></span>
+                  </label>
+                </div>
+                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                  <label class="flex flex-col min-w-40 flex-1">
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($password_err)) ? 'border-red-500' : ''; ?>"
+                    />
+                    <span class="text-red-500 text-xs italic pl-1 pt-1"><?php echo $password_err; ?></span>
+                  </label>
+                </div>
+                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                  <label class="flex flex-col min-w-40 flex-1">
+                    <input
+                      type="password"
+                      name="confirm_password"
+                      placeholder="Confirm Password"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($confirm_password_err)) ? 'border-red-500' : ''; ?>"
+                    />
+                    <span class="text-red-500 text-xs italic pl-1 pt-1"><?php echo $confirm_password_err; ?></span>
+                  </label>
+                </div>
+                <div class="flex px-4 py-3">
+                  <button
+                    type="submit"
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 flex-1 bg-[#f4c653] text-[#221d11] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e5b843]"
+                  >
+                    <span class="truncate">Create Account</span>
+                  </button>
+                </div>
+            </form>
+            <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
+                Already have an account? <a href="<?php echo BASE_URL . '/login.php'; ?>" class="underline hover:text-[#f4c653]">Log in</a>
+            </p>
           </div>
-        </div>
+        </main>
+        <footer class="flex justify-center border-t border-solid border-t-[#483e23] mt-auto">
+            <div class="flex max-w-[960px] flex-1 flex-col py-5 px-4">
+                <p class="text-[#caba91] text-xs sm:text-sm font-normal leading-normal text-center">© <?php echo date("Y"); ?> CN Auto. All rights reserved.</p>
+            </div>
+        </footer>
       </div>
     </div>
   </body>

@@ -10,17 +10,36 @@
 
     <title>Stitch Design</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   </head>
   <body>
+    <?php
+    require_once 'config.php';
+    require_once 'utils/functions.php';
+
+    $all_services = get_all_services($mysqli);
+    $user_vehicles = [];
+    if (is_logged_in()) {
+        $user_vehicles = get_user_vehicles($mysqli, $_SESSION['user_id']);
+    }
+
+    // Retrieve form data and errors from session if they exist (after redirect from book_appointment.php)
+    $form_data = $_SESSION['form_data'] ?? [];
+    $form_errors = $_SESSION['form_errors'] ?? [];
+    unset($_SESSION['form_data'], $_SESSION['form_errors']);
+
+    $selected_service_id = $form_data['service_id'] ?? ($_GET['service_id'] ?? '');
+    ?>
     <div
       class="relative flex size-full min-h-screen flex-col bg-[#232010] dark group/design-root overflow-x-hidden"
       style='--select-button-svg: url(&apos;data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(205,194,142)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e&apos;); font-family: "Space Grotesk", "Noto Sans", sans-serif;'
     >
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-10 py-3">
-          <div class="flex items-center gap-4 text-white">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-4 sm:px-10 py-3">
+          <a href="<?php echo BASE_URL . '/home.php'; ?>" class="flex items-center gap-4 text-white">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -31,99 +50,232 @@
                 ></path>
               </svg>
             </div>
-            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN</h2>
-          </div>
-          <div class="flex flex-1 justify-end gap-8">
-            <div class="flex items-center gap-9">
-              <a class="text-white text-sm font-medium leading-normal" href="#">Services</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
-            </div>
-            <button
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#4a4321] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-            >
-              <span class="truncate">Log In</span>
-            </button>
+            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
+          </a>
+          <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
+             <nav class="hidden sm:flex items-center gap-6">
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">Contact</a>
+            </nav>
+             <?php if (is_logged_in()): ?>
+                <a href="<?php echo is_admin() ? BASE_URL . '/dashboardAdmin.php' : BASE_URL . '/areacliente.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors"><?php echo is_admin() ? 'Admin' : 'My Account'; ?></a>
+                <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a]">Logout</a>
+            <?php else: ?>
+                <a href="<?php echo BASE_URL . '/login.php'; ?>" class="flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a]">Log In</a>
+            <?php endif; ?>
           </div>
         </header>
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
-            <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Book your service</h2>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <select
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 bg-[image:--select-button-svg] placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                >
-                  <option value="one">Select service</option>
-                  <option value="two">two</option>
-                  <option value="three">three</option>
-                </select>
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Vehicle make"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Vehicle model"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Vehicle year"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="License plate"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Preferred date"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Preferred time"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#6a5f2f] bg-[#353017] focus:border-[#6a5f2f] h-14 placeholder:text-[#cdc28e] p-[15px] text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex px-4 py-3">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#fcdd53] text-[#232010] text-base font-bold leading-normal tracking-[0.015em]"
-              >
-                <span class="truncate">Continue</span>
-              </button>
-            </div>
+        <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col w-full sm:w-[512px] max-w-[512px] py-5 flex-1">
+            <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Book Your Service</h2>
+            <?php echo display_flash_message(); ?>
+
+            <form id="bookingForm" action="<?php echo BASE_URL . '/book_appointment.php'; ?>" method="POST">
+                <div class="form-group px-4 py-3">
+                    <label for="service_id" class="block text-[#cdc28e] text-sm font-medium mb-1">Service</label>
+                    <select name="service_id" id="service_id" required
+                      class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] text-base <?php echo isset($form_errors['service_id']) ? 'border-red-500' : ''; ?>"
+                    >
+                      <option value="">Select service</option>
+                      <?php foreach ($all_services as $service): ?>
+                        <option value="<?php echo htmlspecialchars($service['id']); ?>" <?php echo ($selected_service_id == $service['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($service['name']); ?> (<?php echo htmlspecialchars($service['duration']); ?> mins - $<?php echo htmlspecialchars($service['price']); ?>)
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                    <?php if(isset($form_errors['service_id'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['service_id']; ?></p><?php endif; ?>
+                </div>
+
+                <?php if (!is_logged_in()): ?>
+                    <h3 class="text-white text-xl font-semibold px-4 pt-4 pb-2">Guest Information</h3>
+                    <div class="form-group px-4 py-3">
+                        <label for="guest_name" class="block text-[#cdc28e] text-sm font-medium mb-1">Full Name</label>
+                        <input type="text" name="guest_name" id="guest_name" placeholder="Your Full Name" required value="<?php echo htmlspecialchars($form_data['guest_name'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['guest_name']) ? 'border-red-500' : ''; ?>">
+                        <?php if(isset($form_errors['guest_name'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['guest_name']; ?></p><?php endif; ?>
+                    </div>
+                    <div class="form-group px-4 py-3">
+                        <label for="guest_email" class="block text-[#cdc28e] text-sm font-medium mb-1">Email</label>
+                        <input type="email" name="guest_email" id="guest_email" placeholder="Your Email" required value="<?php echo htmlspecialchars($form_data['guest_email'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['guest_email']) ? 'border-red-500' : ''; ?>">
+                        <?php if(isset($form_errors['guest_email'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['guest_email']; ?></p><?php endif; ?>
+                    </div>
+                    <div class="form-group px-4 py-3">
+                        <label for="guest_phone" class="block text-[#cdc28e] text-sm font-medium mb-1">Phone Number</label>
+                        <input type="tel" name="guest_phone" id="guest_phone" placeholder="Your Phone Number" required value="<?php echo htmlspecialchars($form_data['guest_phone'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['guest_phone']) ? 'border-red-500' : ''; ?>">
+                        <?php if(isset($form_errors['guest_phone'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['guest_phone']; ?></p><?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+                <h3 class="text-white text-xl font-semibold px-4 pt-4 pb-2">Vehicle Information</h3>
+                <?php if (is_logged_in() && !empty($user_vehicles)): ?>
+                <div class="form-group px-4 py-3">
+                    <label for="selected_vehicle_id" class="block text-[#cdc28e] text-sm font-medium mb-1">Select Your Vehicle</label>
+                    <select name="selected_vehicle_id" id="selected_vehicle_id"
+                            class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] text-base">
+                        <option value="">-- Select a saved vehicle --</option>
+                        <?php foreach($user_vehicles as $vehicle): ?>
+                            <option value="<?php echo $vehicle['id']; ?>"
+                                    data-make="<?php echo htmlspecialchars($vehicle['make']); ?>"
+                                    data-model="<?php echo htmlspecialchars($vehicle['model']); ?>"
+                                    data-year="<?php echo htmlspecialchars($vehicle['year']); ?>"
+                                    data-plate="<?php echo htmlspecialchars($vehicle['license_plate']); ?>"
+                                    <?php echo (isset($form_data['selected_vehicle_id']) && $form_data['selected_vehicle_id'] == $vehicle['id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                        <option value="new" <?php echo (isset($form_data['selected_vehicle_id']) && $form_data['selected_vehicle_id'] == 'new') ? 'selected' : ''; ?>>-- Add New Vehicle --</option>
+                    </select>
+                </div>
+                <?php endif; ?>
+
+                <div id="new-vehicle-fields" class="<?php echo (is_logged_in() && !empty($user_vehicles) && (!isset($form_data['selected_vehicle_id']) || $form_data['selected_vehicle_id'] != 'new')) ? 'hidden' : ''; ?>">
+                    <div class="form-group px-4 py-3">
+                        <label for="vehicle_make" class="block text-[#cdc28e] text-sm font-medium mb-1">Vehicle Make</label>
+                        <input type="text" name="vehicle_make" id="vehicle_make" placeholder="e.g., Toyota" value="<?php echo htmlspecialchars($form_data['vehicle_make'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['vehicle_make']) ? 'border-red-500' : ''; ?>">
+                        <?php if(isset($form_errors['vehicle_make'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['vehicle_make']; ?></p><?php endif; ?>
+                    </div>
+                    <div class="form-group px-4 py-3">
+                        <label for="vehicle_model" class="block text-[#cdc28e] text-sm font-medium mb-1">Vehicle Model</label>
+                        <input type="text" name="vehicle_model" id="vehicle_model" placeholder="e.g., Camry" value="<?php echo htmlspecialchars($form_data['vehicle_model'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['vehicle_model']) ? 'border-red-500' : ''; ?>">
+                        <?php if(isset($form_errors['vehicle_model'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['vehicle_model']; ?></p><?php endif; ?>
+                    </div>
+                    <div class="form-group px-4 py-3">
+                        <label for="vehicle_year" class="block text-[#cdc28e] text-sm font-medium mb-1">Vehicle Year</label>
+                        <input type="number" name="vehicle_year" id="vehicle_year" placeholder="e.g., 2020" value="<?php echo htmlspecialchars($form_data['vehicle_year'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['vehicle_year']) ? 'border-red-500' : ''; ?>" min="1900" max="<?php echo date('Y') + 1; ?>">
+                        <?php if(isset($form_errors['vehicle_year'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['vehicle_year']; ?></p><?php endif; ?>
+                    </div>
+                    <div class="form-group px-4 py-3">
+                        <label for="license_plate" class="block text-[#cdc28e] text-sm font-medium mb-1">License Plate</label>
+                        <input type="text" name="license_plate" id="license_plate" placeholder="e.g., ABC1234" value="<?php echo htmlspecialchars($form_data['license_plate'] ?? ''); ?>"
+                               class="form-input w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['license_plate']) ? 'border-red-500' : ''; ?>">
+                        <?php if(isset($form_errors['license_plate'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['license_plate']; ?></p><?php endif; ?>
+                    </div>
+                    <?php if (is_logged_in()): ?>
+                    <div class="form-group px-4 py-2">
+                        <label class="flex items-center text-[#cdc28e]">
+                            <input type="checkbox" name="save_vehicle_details" value="1" class="form-checkbox h-5 w-5 text-[#fcdd53] bg-[#353017] border-[#6a5f2f] focus:ring-[#fcdd53]" checked>
+                            <span class="ml-2 text-sm">Save these vehicle details to my account</span>
+                        </label>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
+
+                <h3 class="text-white text-xl font-semibold px-4 pt-4 pb-2">Appointment Details</h3>
+                <div class="form-group px-4 py-3">
+                    <label for="booking_date" class="block text-[#cdc28e] text-sm font-medium mb-1">Preferred Date</label>
+                    <input type="text" name="booking_date" id="booking_date" placeholder="Select date" required value="<?php echo htmlspecialchars($form_data['booking_date'] ?? ''); ?>"
+                           class="form-input datepicker w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['booking_date']) ? 'border-red-500' : ''; ?>">
+                    <?php if(isset($form_errors['booking_date'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['booking_date']; ?></p><?php endif; ?>
+                </div>
+                <div class="form-group px-4 py-3">
+                    <label for="booking_time" class="block text-[#cdc28e] text-sm font-medium mb-1">Preferred Time</label>
+                    <input type="text" name="booking_time" id="booking_time" placeholder="Select time" required value="<?php echo htmlspecialchars($form_data['booking_time'] ?? ''); ?>"
+                           class="form-input timepicker w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] h-14 p-[15px] placeholder:text-[#cdc28e] <?php echo isset($form_errors['booking_time']) ? 'border-red-500' : ''; ?>">
+                    <?php if(isset($form_errors['booking_time'])): ?><p class="text-red-500 text-xs mt-1"><?php echo $form_errors['booking_time']; ?></p><?php endif; ?>
+                </div>
+
+                 <div class="form-group px-4 py-3">
+                    <label for="notes" class="block text-[#cdc28e] text-sm font-medium mb-1">Additional Notes (Optional)</label>
+                    <textarea name="notes" id="notes" rows="3" placeholder="Any specific requests or information..."
+                              class="form-textarea w-full rounded-lg text-white border border-[#6a5f2f] bg-[#353017] focus:border-[#fcdd53] p-[15px] placeholder:text-[#cdc28e]"><?php echo htmlspecialchars($form_data['notes'] ?? ''); ?></textarea>
+                </div>
+
+
+                <div class="flex px-4 py-3 mt-4">
+                  <button type="submit"
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#fcdd53] text-[#232010] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#fadc70]"
+                  >
+                    <span class="truncate">Book Appointment</span>
+                  </button>
+                </div>
+            </form>
           </div>
-        </div>
+        </main>
+        <footer class="flex justify-center border-t border-solid border-t-[#4a4321] mt-auto">
+            <div class="flex max-w-[960px] flex-1 flex-col py-5 px-4">
+                <p class="text-[#cdc28e] text-xs sm:text-sm font-normal leading-normal text-center">© <?php echo date("Y"); ?> CN Auto. All rights reserved.</p>
+            </div>
+        </footer>
       </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickr(".datepicker", {
+                altInput: true,
+                altFormat: "F j, Y",
+                dateFormat: "Y-m-d",
+                minDate: "today"
+            });
+            flatpickr(".timepicker", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                altInput: true,
+                altFormat: "h:i K",
+                minuteIncrement: 15,
+                minTime: "08:00",
+                maxTime: "17:00"
+            });
+
+            const vehicleSelect = document.getElementById('selected_vehicle_id');
+            const newVehicleFields = document.getElementById('new-vehicle-fields');
+            const makeInput = document.getElementById('vehicle_make');
+            const modelInput = document.getElementById('vehicle_model');
+            const yearInput = document.getElementById('vehicle_year');
+            const plateInput = document.getElementById('license_plate');
+
+            if (vehicleSelect) {
+                vehicleSelect.addEventListener('change', function() {
+                    if (this.value === 'new' || this.value === '') {
+                        newVehicleFields.classList.remove('hidden');
+                        makeInput.value = ''; makeInput.required = true;
+                        modelInput.value = ''; modelInput.required = true;
+                        yearInput.value = ''; yearInput.required = true;
+                        plateInput.value = ''; plateInput.required = true;
+                    } else {
+                        newVehicleFields.classList.add('hidden');
+                        const selectedOption = this.options[this.selectedIndex];
+                        makeInput.value = selectedOption.dataset.make || ''; makeInput.required = false;
+                        modelInput.value = selectedOption.dataset.model || ''; modelInput.required = false;
+                        yearInput.value = selectedOption.dataset.year || ''; yearInput.required = false;
+                        plateInput.value = selectedOption.dataset.plate || ''; plateInput.required = false;
+                    }
+                });
+                // Trigger change on load if a vehicle is pre-selected to hide new fields
+                if (vehicleSelect.value !== 'new' && vehicleSelect.value !== '') {
+                    vehicleSelect.dispatchEvent(new Event('change'));
+                }
+                 // if form_data has selected_vehicle_id as new, show the fields
+                <?php if(isset($form_data['selected_vehicle_id']) && $form_data['selected_vehicle_id'] == 'new'): ?>
+                    newVehicleFields.classList.remove('hidden');
+                    makeInput.required = true; modelInput.required = true; yearInput.required = true; plateInput.required = true;
+                <?php elseif(is_logged_in() && !empty($user_vehicles) && (!isset($form_data['selected_vehicle_id']) || $form_data['selected_vehicle_id'] == '')): ?>
+                    // If logged in, has vehicles, and nothing specific selected (or "select vehicle" is chosen), default to new vehicle hidden
+                    // unless an error in new vehicle fields occurred
+                     <?php if( !(isset($form_errors['vehicle_make']) || isset($form_errors['vehicle_model']) || isset($form_errors['vehicle_year']) || isset($form_errors['license_plate'])) ) : ?>
+                        newVehicleFields.classList.add('hidden');
+                        makeInput.required = false; modelInput.required = false; yearInput.required = false; plateInput.required = false;
+                     <?php else: ?>
+                        newVehicleFields.classList.remove('hidden');
+                         makeInput.required = true; modelInput.required = true; yearInput.required = true; plateInput.required = true;
+                     <?php endif; ?>
+                <?php else: ?>
+                     newVehicleFields.classList.remove('hidden');
+                     makeInput.required = true; modelInput.required = true; yearInput.required = true; plateInput.required = true;
+                <?php endif; ?>
+            } else {
+                 // If no vehicle select dropdown (e.g. guest user), new vehicle fields are always visible
+                newVehicleFields.classList.remove('hidden');
+                makeInput.required = true; modelInput.required = true; yearInput.required = true; plateInput.required = true;
+            }
+        });
+    </script>
   </body>
 </html>

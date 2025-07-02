@@ -10,14 +10,19 @@
 
     <title>Stitch Design</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
   <body>
+    <?php
+        require_once 'config.php';
+        require_once 'utils/functions.php';
+        $all_services = get_all_services($mysqli); // Fetch all services
+    ?>
     <div class="relative flex size-full min-h-screen flex-col bg-[#232010] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-10 py-3">
-          <div class="flex items-center gap-4 text-white">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-4 sm:px-10 py-3">
+          <a href="<?php echo BASE_URL . '/home.php'; ?>" class="flex items-center gap-4 text-white">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -28,211 +33,123 @@
                 ></path>
               </svg>
             </div>
-            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN</h2>
-          </div>
-          <div class="flex flex-1 justify-end gap-8">
-            <div class="flex items-center gap-9">
-              <a class="text-white text-sm font-medium leading-normal" href="#">Home</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">Services</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
-            </div>
-            <button
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#fcdd53] text-[#232010] text-sm font-bold leading-normal tracking-[0.015em]"
+            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
+          </a>
+          <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
+            <nav class="hidden sm:flex items-center gap-6">
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] aria-[current=page]:text-[#fcdd53] aria-[current=page]:font-bold" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="page">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">Contact</a>
+            </nav>
+            <?php if (is_logged_in()): ?>
+                <a href="<?php echo is_admin() ? BASE_URL . '/dashboardAdmin.php' : BASE_URL . '/areacliente.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors"><?php echo is_admin() ? 'Admin' : 'My Account'; ?></a>
+                <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a]">Logout</a>
+            <?php else: ?>
+                 <a href="<?php echo BASE_URL . '/login.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors">Log In</a>
+            <?php endif; ?>
+            <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
+              class="flex min-w-[80px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#fcdd53] text-[#232010] text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#fadc70]"
             >
               <span class="truncate">Book Now</span>
-            </button>
+            </a>
           </div>
         </header>
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
             <div class="flex flex-wrap justify-between gap-3 p-4">
               <div class="flex min-w-72 flex-col gap-3">
-                <p class="text-white tracking-light text-[32px] font-bold leading-tight">Our Services</p>
-                <p class="text-[#cdc28e] text-sm font-normal leading-normal">
+                <h1 class="text-white tracking-light text-3xl sm:text-[32px] font-bold leading-tight">Our Services</h1>
+                <p class="text-[#cdc28e] text-sm font-normal leading-normal max-w-2xl">
                   Explore our comprehensive range of vehicle inspection and maintenance services, designed to keep your vehicle in optimal condition. Each service is performed by
                   our certified technicians using state-of-the-art equipment.
                 </p>
               </div>
             </div>
-            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Inspection Services</h2>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Comprehensive Vehicle Inspection</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      A thorough inspection covering all major components, including engine, brakes, suspension, and electrical systems. Receive a detailed report with
-                      recommendations.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$199 - 2 hours</span>
-                  </button>
+
+            <?php
+            // Example: Group services by type if you add a 'type' column to your services table
+            // For now, we'll list them all under generic headings or just one list.
+            // Let's assume two types for demonstration: 'inspection' and 'maintenance'
+            // $inspection_services = array_filter($all_services, fn($s) => str_contains(strtolower($s['name']), 'inspection'));
+            // $maintenance_services = array_filter($all_services, fn($s) => !str_contains(strtolower($s['name']), 'inspection'));
+            // For simplicity, let's just loop through all services. You can categorize them later.
+
+            $service_images = [ // Placeholder images - replace with actual relevant images
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuBd9htGa6cL_zpGjZzMbbQm_upMpOzepf_WnCB3mc9AhbS4JdSuGA49doR8rG-8jS3aPJNoKXetNtqm_UG2qFQJUao-5MrnG-BOyJnEHfPE3oqcY7reLqgrSX53BtSzsUUJzZAZXPv5TQNhEu7rP0budQUgkXoLMeN6H0DlB6bDLcuWINFaP2-fw9U0NfosSZLQoR-QynC18cKO5eKoRbNikwTFEfZutbLWp_iBi0iVUIic0D0uMKve6rApZ6M3wilJCVc2g7EVfOo",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuDk2Mle0hNeFutRppkYZIo7MzZHCl_LoUmBquF8V91AQcMnG_bqw5YVzuykOWRpQ1eUJ3trMTGa0jaSL74V9mAGAG1-g2VuJ4ok1rzZg5uFGDVNl0RnT3AX8b9JnctwmjIXSUsx4pLA-dN4fgQH6SJQiA13sSX37Ji91O37kR915tLuNZdCqLwXH-HF5GiQUdf_qVJs2ELE6rhwUNrO6sT1S_Kr9D6XaV5DmsJlruXLqSS7mRu_k2DIMq6zYniz9qUBMef0PFpCLIw",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuC0pfAiONi5Ffvpsayi6VvB3nTIDK3aBNIbYZ7K2blZQlsW2jdHlXolVvub47YnactQBhAXg3_kRGTOOKeyIBrSziAHisdarLi3VeZzis5vMLi_UHyASKFzkBbHlzDpmIzoSiQ8zkmVwgkuZZL7QpWxJfMt8SdVJ464SLt6nhFtHNWryEtSV5TO3tzkoJwXur8DJ6Bhz2h8op5nSKMjQVAdglbrvXU1NOg2HvSHaSE9O9j5moAzsdM-NFRZ3svltHAZDPv96CpPE-w",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuD5KXIvYvGO7feRNZ-R7ojir3fKe0HqLhWkRnrGU4T62gBgvPpWxONJ1xz_isrNbvGCvi1DmJG6S71uIsWFo1J_FSQr_4IhJZt0LaGElfhYvF3Yxm2Ub7iMVzxua4Ad2xzmIxbXZlEe_A93bJ5vIgri27Crgm08Xe7jUP3H32ZozeKl8DNclL4AHBUoXl-EH6Uo-fthyMuSowId8C35bhtZj3Da1jABxdA5oiJjf6u0XPb8Qqpn_DFUwoASw9Igfo5s1XVPj21dA4A",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuBj6iA7MgkI-VqAVHSfw6bG1yHB-RK65ngxAsb8UB1mkYMz0EB4-nt9SRZpADV82L8yXxprhoAKAmHSI7wzvlXi_tPZAgZnhRgmCxJVcuFteu9Zp4AQ-UfuTl29b6vEd1AqjfWAAY7IlhfQBgJ_Khi811UhyemG69ZDQjOI0TNa1_Sge8LpnmRMPYS9MlaQMIssULGeftZePMTRHeBRdoMbd_F9qg_lEGxJkIRbonNNYySwNT0s75Ci9bmHX7MARKJVLE8mJHH5-z8",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuDivxdPonskQy7knJ4KETZKzaSuQxU37qyXSKR3Ruz0mQKfmX5-38f9zRhU_xTzUbGCxtKpjfz6whKhZKQRff8lcM9QO8ABJm-0Oh1Q5ARg94lBVPSh18Y8f7IAHV9B-hvFdNRKxIDq8MipSv6UbQ9ESV15QQ4QOrzi10TfwMPmfpzJ-VVZ3OVDtyrHGFDpqUJgUjAxRgRR2fgaLljNEMsBgWYfd-SGUdbdaOtOSOeY8a1XbLR-RPXcN0lKhqu0aHeFOfRceF32R8Y",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuAWnywXwIsNbKiBcvKVvdobrDvchbM3zoG1aKCTc-20pWDo_cCHBtF-afz1mUPykrrZOVIN6Wjf7sp2I6BNGrsmatPDFlAqmP_RRZ3e--7fILmlNciHPNfxaU5XCgghAYpTvnFoSoaVo9betHL55WA4RxAKiELiefxO57JMYulgZHV4UOa8RW-_c13Z8OBZ89H--Etdu9sCwl-7iBbU5TYT_Acxi8Wwknhfuw1f3inhb5M7nIPvINlks5wjKBdoU7PTfc8-3gLvdRY",
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuA0h3IqvKSvyn33Z6dH_kSxOlS4rl0SA6p9tRQeTVLJ4q_yx23D0Sroi1rUyfwUry14V3HKdFdPIDKQDHQefhF4l4sxU5UlD3L0sFlbMBQjVIPdOZUWdOuvkLI4vV5Hcz_pVS8vn79mEH2Ffp-xM3v-HpV7gUgkVZmT66dFFTlYc9Z3W0XEr95Z04KrnhwGnr_Li_uM7fzvUnYeIuZIUHPauTm6EzdVSr4lvkLoZj7mBV3BYP9_L84HFChW_B0zgInGTdspucfqxds"
+            ];
+            $image_idx = 0;
+            ?>
+
+            <?php if (!empty($all_services)): ?>
+                <?php
+                // Example: Group services by type for display if a 'type' field existed
+                // $services_by_type = [];
+                // foreach ($all_services as $service) {
+                //    $type = $service['type'] ?? 'General'; // Assuming a 'type' column
+                //    $services_by_type[$type][] = $service;
+                // }
+                // foreach ($services_by_type as $type_name => $services_in_type):
+                ?>
+                    <!-- <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"><?php echo htmlspecialchars(ucfirst($type_name)); ?> Services</h2> -->
+
+                <div class="space-y-6">
+                    <?php foreach ($all_services as $service): ?>
+                        <div class="p-4">
+                            <div class="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-lg">
+                                <div class="flex flex-col gap-3 flex-[2_2_0px]">
+                                    <div class="flex flex-col gap-1">
+                                        <h3 class="text-white text-lg sm:text-base font-bold leading-tight"><?php echo htmlspecialchars($service['name']); ?></h3>
+                                        <p class="text-[#cdc28e] text-sm font-normal leading-normal">
+                                            <?php echo nl2br(htmlspecialchars($service['description'] ?? 'Details about this service.')); ?>
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center gap-4 mt-auto">
+                                        <span class="text-sm font-medium text-white bg-[#4a4321] px-3 py-1.5 rounded-md">
+                                            $<?php echo htmlspecialchars(number_format($service['price'], 2)); ?> - <?php echo htmlspecialchars($service['duration']); ?> mins
+                                        </span>
+                                        <a href="<?php echo BASE_URL . '/bookinapp.php?service_id=' . $service['id']; ?>"
+                                           class="text-sm font-medium text-[#232010] bg-[#fcdd53] px-3 py-1.5 rounded-md hover:bg-[#fadc70] transition-colors">
+                                            Book This Service
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="w-full sm:w-1/3 lg:w-1/4 flex-1 min-h-[150px] sm:min-h-0">
+                                    <div class="w-full h-full bg-center bg-no-repeat aspect-video sm:aspect-auto bg-cover rounded-lg"
+                                        style='background-image: url("<?php echo $service_images[$image_idx % count($service_images)]; $image_idx++; ?>");'>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBd9htGa6cL_zpGjZzMbbQm_upMpOzepf_WnCB3mc9AhbS4JdSuGA49doR8rG-8jS3aPJNoKXetNtqm_UG2qFQJUao-5MrnG-BOyJnEHfPE3oqcY7reLqgrSX53BtSzsUUJzZAZXPv5TQNhEu7rP0budQUgkXoLMeN6H0DlB6bDLcuWINFaP2-fw9U0NfosSZLQoR-QynC18cKO5eKoRbNikwTFEfZutbLWp_iBi0iVUIic0D0uMKve6rApZ6M3wilJCVc2g7EVfOo");'
-                ></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Pre-Purchase Inspection</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      Ensure the vehicle you're buying is in top shape. We'll assess its condition and provide a detailed report to help you make an informed decision.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$249 - 2.5 hours</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDk2Mle0hNeFutRppkYZIo7MzZHCl_LoUmBquF8V91AQcMnG_bqw5YVzuykOWRpQ1eUJ3trMTGa0jaSL74V9mAGAG1-g2VuJ4ok1rzZg5uFGDVNl0RnT3AX8b9JnctwmjIXSUsx4pLA-dN4fgQH6SJQiA13sSX37Ji91O37kR915tLuNZdCqLwXH-HF5GiQUdf_qVJs2ELE6rhwUNrO6sT1S_Kr9D6XaV5DmsJlruXLqSS7mRu_k2DIMq6zYniz9qUBMef0PFpCLIw");'
-                ></div>
-              </div>
-            </div>
-            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Maintenance Services</h2>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Oil Change and Filter Replacement</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      Keep your engine running smoothly with our professional oil change service. Includes high-quality oil and filter replacement.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$99 - 1 hour</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC0pfAiONi5Ffvpsayi6VvB3nTIDK3aBNIbYZ7K2blZQlsW2jdHlXolVvub47YnactQBhAXg3_kRGTOOKeyIBrSziAHisdarLi3VeZzis5vMLi_UHyASKFzkBbHlzDpmIzoSiQ8zkmVwgkuZZL7QpWxJfMt8SdVJ464SLt6nhFtHNWryEtSV5TO3tzkoJwXur8DJ6Bhz2h8op5nSKMjQVAdglbrvXU1NOg2HvSHaSE9O9j5moAzsdM-NFRZ3svltHAZDPv96CpPE-w");'
-                ></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Brake Service</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      Ensure your safety with our comprehensive brake service. Includes inspection, pad replacement, and rotor resurfacing.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$299 - 3 hours</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD5KXIvYvGO7feRNZ-R7ojir3fKe0HqLhWkRnrGU4T62gBgvPpWxONJ1xz_isrNbvGCvi1DmJG6S71uIsWFo1J_FSQr_4IhJZt0LaGElfhYvF3Yxm2Ub7iMVzxua4Ad2xzmIxbXZlEe_A93bJ5vIgri27Crgm08Xe7jUP3H32ZozeKl8DNclL4AHBUoXl-EH6Uo-fthyMuSowId8C35bhtZj3Da1jABxdA5oiJjf6u0XPb8Qqpn_DFUwoASw9Igfo5s1XVPj21dA4A");'
-                ></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Tire Rotation and Balancing</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      Extend the life of your tires and improve handling with our tire rotation and balancing service.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$79 - 1.5 hours</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBj6iA7MgkI-VqAVHSfw6bG1yHB-RK65ngxAsb8UB1mkYMz0EB4-nt9SRZpADV82L8yXxprhoAKAmHSI7wzvlXi_tPZAgZnhRgmCxJVcuFteu9Zp4AQ-UfuTl29b6vEd1AqjfWAAY7IlhfQBgJ_Khi811UhyemG69ZDQjOI0TNa1_Sge8LpnmRMPYS9MlaQMIssULGeftZePMTRHeBRdoMbd_F9qg_lEGxJkIRbonNNYySwNT0s75Ci9bmHX7MARKJVLE8mJHH5-z8");'
-                ></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Wheel Alignment</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">Improve your vehicle's handling and fuel efficiency with our precise wheel alignment service.</p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$129 - 1.5 hours</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDivxdPonskQy7knJ4KETZKzaSuQxU37qyXSKR3Ruz0mQKfmX5-38f9zRhU_xTzUbGCxtKpjfz6whKhZKQRff8lcM9QO8ABJm-0Oh1Q5ARg94lBVPSh18Y8f7IAHV9B-hvFdNRKxIDq8MipSv6UbQ9ESV15QQ4QOrzi10TfwMPmfpzJ-VVZ3OVDtyrHGFDpqUJgUjAxRgRR2fgaLljNEMsBgWYfd-SGUdbdaOtOSOeY8a1XbLR-RPXcN0lKhqu0aHeFOfRceF32R8Y");'
-                ></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Battery Replacement</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      Ensure reliable starting power with our battery replacement service. Includes installation and testing.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$149 - 1 hour</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAWnywXwIsNbKiBcvKVvdobrDvchbM3zoG1aKCTc-20pWDo_cCHBtF-afz1mUPykrrZOVIN6Wjf7sp2I6BNGrsmatPDFlAqmP_RRZ3e--7fILmlNciHPNfxaU5XCgghAYpTvnFoSoaVo9betHL55WA4RxAKiELiefxO57JMYulgZHV4UOa8RW-_c13Z8OBZ89H--Etdu9sCwl-7iBbU5TYT_Acxi8Wwknhfuw1f3inhb5M7nIPvINlks5wjKBdoU7PTfc8-3gLvdRY");'
-                ></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="flex items-stretch justify-between gap-4 rounded-lg">
-                <div class="flex flex-[2_2_0px] flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <p class="text-white text-base font-bold leading-tight">Air Conditioning Service</p>
-                    <p class="text-[#cdc28e] text-sm font-normal leading-normal">
-                      Stay cool and comfortable with our air conditioning service. Includes inspection, refrigerant recharge, and leak detection.
-                    </p>
-                  </div>
-                  <button
-                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 flex-row-reverse bg-[#4a4321] text-white text-sm font-medium leading-normal w-fit"
-                  >
-                    <span class="truncate">$179 - 2 hours</span>
-                  </button>
-                </div>
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex-1"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA0h3IqvKSvyn33Z6dH_kSxOlS4rl0SA6p9tRQeTVLJ4q_yx23D0Sroi1rUyfwUry14V3HKdFdPIDKQDHQefhF4l4sxU5UlD3L0sFlbMBQjVIPdOZUWdOuvkLI4vV5Hcz_pVS8vn79mEH2Ffp-xM3v-HpV7gUgkVZmT66dFFTlYc9Z3W0XEr95Z04KrnhwGnr_Li_uM7fzvUnYeIuZIUHPauTm6EzdVSr4lvkLoZj7mBV3BYP9_L84HFChW_B0zgInGTdspucfqxds");'
-                ></div>
-              </div>
-            </div>
-            <div class="flex px-4 py-3 justify-center">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-[#fcdd53] text-[#232010] text-base font-bold leading-normal tracking-[0.015em]"
+                <?php // endforeach; // End of services_by_type loop ?>
+            <?php else: ?>
+                <p class="text-[#cdc28e] p-4">No services currently available. Please check back later.</p>
+            <?php endif; ?>
+
+
+            <div class="flex px-4 py-6 justify-center">
+              <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-[#fcdd53] text-[#232010] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#fadc70]"
               >
-                <span class="truncate">Book Now</span>
-              </button>
+                <span class="truncate">Book an Appointment</span>
+              </a>
             </div>
           </div>
-        </div>
+        </main>
+        <footer class="flex justify-center border-t border-solid border-t-[#4a4321] mt-auto">
+            <div class="flex max-w-[960px] flex-1 flex-col py-5 px-4">
+                <p class="text-[#cdc28e] text-xs sm:text-sm font-normal leading-normal text-center">© <?php echo date("Y"); ?> CN Auto. All rights reserved.</p>
+            </div>
+        </footer>
       </div>
     </div>
   </body>
