@@ -1,3 +1,86 @@
+<?php
+require_once 'config.php';
+
+// If user is already logged in, redirect them
+if (is_logged_in()) {
+    if (is_admin()) {
+        redirect(BASE_URL . '/dashboardAdmin.php');
+    } else {
+        redirect(BASE_URL . '/areacliente.php');
+    }
+}
+
+$email = $password = "";
+$email_err = $password_err = $login_err = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    if (empty(trim($_POST["email"]))) {
+        $email_err = "Please enter email.";
+    } else {
+        $email = sanitize_input($_POST["email"]);
+    }
+
+    if (empty(trim($_POST["password"]))) {
+        $password_err = "Please enter your password.";
+    } else {
+        $password = trim($_POST["password"]);
+    }
+
+    if (empty($email_err) && empty($password_err)) {
+        $sql = "SELECT id, name, email, password, role FROM users WHERE email = ?";
+
+        if ($stmt = $mysqli->prepare($sql)) {
+            $stmt->bind_param("s", $param_email);
+            $param_email = $email;
+
+            if ($stmt->execute()) {
+                $stmt->store_result();
+
+                if ($stmt->num_rows == 1) {
+                    $stmt->bind_result($id, $name, $db_email, $hashed_password, $role);
+                    if ($stmt->fetch()) {
+                        if (verify_password($password, $hashed_password)) {
+                            // Password is correct, so start a new session
+                            if (session_status() == PHP_SESSION_NONE) {
+                                session_start();
+                            }
+
+                            // Store data in session variables
+                            $_SESSION["user_id"] = $id;
+                            $_SESSION["user_name"] = $name;
+                            $_SESSION["user_email"] = $db_email;
+                            $_SESSION["user_role"] = $role;
+
+                            // Redirect user to appropriate page
+                            $redirect_url = isset($_SESSION['redirect_url']) ? $_SESSION['redirect_url'] : null;
+                            unset($_SESSION['redirect_url']); // Clear the stored URL
+
+                            if ($role == 'admin') {
+                                redirect(BASE_URL . '/dashboardAdmin.php');
+                            } elseif ($redirect_url) {
+                                header("Location: " . $redirect_url); // Redirect to stored URL
+                                exit;
+                            }
+                             else {
+                                redirect(BASE_URL . '/areacliente.php');
+                            }
+                        } else {
+                            $login_err = "Invalid email or password.";
+                        }
+                    }
+                } else {
+                    $login_err = "Invalid email or password.";
+                }
+            } else {
+                $login_err = "Oops! Something went wrong. Please try again later.";
+            }
+            $stmt->close();
+        }
+    }
+    // $mysqli->close(); // Connection will be closed at the end of config.php or script execution
+}
+?>
 <html>
   <head>
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
@@ -7,72 +90,97 @@
       onload="this.rel='stylesheet'"
       href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700"
     />
-
-    <title>Stitch Design</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CN Auto</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
   <body>
     <div class="relative flex size-full min-h-screen flex-col bg-[#221d11] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#483e23] px-10 py-3">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#483e23] px-4 sm:px-10 py-3">
           <div class="flex items-center gap-4 text-white">
-            <div class="size-4">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </div>
-            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
+            <a href="<?php echo BASE_URL . '/home.php'; ?>" class="flex items-center gap-4">
+                <div class="size-4">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z"
+                    fill="currentColor"
+                    ></path>
+                </svg>
+                </div>
+                <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
+            </a>
           </div>
-          <div class="flex flex-1 justify-end gap-8">
-            <div class="flex items-center gap-9">
-              <a class="text-white text-sm font-medium leading-normal" href="#">Services</a>
+          <div class="flex flex-1 justify-end gap-2 sm:gap-8">
+            <div class="hidden sm:flex items-center gap-9">
+              <a class="text-white text-sm font-medium leading-normal" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
               <a class="text-white text-sm font-medium leading-normal" href="#">About</a>
               <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
             </div>
-            <button
+            <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
               class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#483e23] text-white text-sm font-bold leading-normal tracking-[0.015em]"
             >
               <span class="truncate">Book Now</span>
-            </button>
+            </a>
           </div>
         </header>
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
+        <div class="px-4 sm:px-10 md:px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col w-full sm:w-[512px] max-w-[512px] py-5 flex-1">
             <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Welcome Back</h2>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Email"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <input
-                  placeholder="Password"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-            <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 underline">Forgot Password?</p>
-            <div class="flex px-4 py-3">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-[#f4c653] text-[#221d11] text-base font-bold leading-normal tracking-[0.015em]"
-              >
-                <span class="truncate">Log In</span>
-              </button>
-            </div>
-            <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">Don't have an account? Sign Up</p>
+
+            <?php
+            if(!empty($login_err)){
+                echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">' . $login_err . '</div>';
+            }
+            if(isset($_SESSION['success_message'])){
+                echo '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">' . $_SESSION['success_message'] . '</div>';
+                unset($_SESSION['success_message']);
+            }
+            if(isset($_GET['message'])){
+                echo '<div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">' . htmlspecialchars($_GET['message']) . '</div>';
+            }
+            ?>
+
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                  <label class="flex flex-col min-w-40 flex-1">
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($email_err)) ? 'border-red-500' : ''; ?>"
+                      value="<?php echo $email; ?>"
+                    />
+                    <span class="text-red-500 text-xs italic"><?php echo $email_err; ?></span>
+                  </label>
+                </div>
+                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                  <label class="flex flex-col min-w-40 flex-1">
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($password_err)) ? 'border-red-500' : ''; ?>"
+                    />
+                    <span class="text-red-500 text-xs italic"><?php echo $password_err; ?></span>
+                  </label>
+                </div>
+                <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 underline"><a href="#">Forgot Password?</a></p>
+                <div class="flex px-4 py-3">
+                  <button
+                    type="submit"
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-[#f4c653] text-[#221d11] text-base font-bold leading-normal tracking-[0.015em]"
+                  >
+                    <span class="truncate">Log In</span>
+                  </button>
+                </div>
+            </form>
+            <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
+                Don't have an account? <a href="<?php echo BASE_URL . '/createaccount.php'; ?>" class="underline">Sign Up</a>
+            </p>
           </div>
         </div>
       </div>
