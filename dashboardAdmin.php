@@ -34,8 +34,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Dashboard</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="<?php echo BASE_URL . '/dashboardAdmin.php?tab=appointments'; ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#4a4321] text-white <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'appointments') ? 'bg-[#4a4321]' : ''; ?>">
                     <div class="text-white" data-icon="Calendar" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -44,8 +44,14 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Appointments</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                   <a href="<?php echo BASE_URL . '/dashboardAdmin.php?tab=add_booking'; ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#4a4321] text-white <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'add_booking') ? 'bg-[#4a4321]' : ''; ?>">
+                    <div class="text-white" data-icon="CalendarPlus" data-size="24px" data-weight="regular">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-40-80h-16v16a8,8,0,0,1-16,0V128H120a8,8,0,0,1,0-16h16V96a8,8,0,0,1,16,0v16h16a8,8,0,0,1,0,16Z"></path></svg>
+                    </div>
+                    <p class="text-white text-sm font-medium leading-normal">Add Booking</p>
+                  </a>
+                  <a href="<?php echo BASE_URL . '/dashboardAdmin.php?tab=services'; ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#4a4321] text-white <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'services') ? 'bg-[#4a4321]' : ''; ?>">
                     <div class="text-white" data-icon="Gear" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -54,8 +60,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Services</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="<?php echo BASE_URL . '/dashboardAdmin.php?tab=users'; ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#4a4321] text-white <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'users') ? 'bg-[#4a4321]' : ''; ?>">
                     <div class="text-white" data-icon="Users" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -63,22 +69,29 @@
                         ></path>
                       </svg>
                     </div>
-                    <p class="text-white text-sm font-medium leading-normal">Staff</p>
+                    <p class="text-white text-sm font-medium leading-normal">Users</p>
+                  </a>
+                  <!-- Staff and Availability are static for now -->
+                  <div class="flex items-center gap-3 px-3 py-2 text-gray-500 cursor-not-allowed">
+                    <div class="text-gray-500" data-icon="Users" data-size="24px" data-weight="regular">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"></path></svg>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium leading-normal">Staff (Soon)</p>
                   </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
-                    <div class="text-white" data-icon="Clock" data-size="24px" data-weight="regular">
+                  <div class="flex items-center gap-3 px-3 py-2 text-gray-500 cursor-not-allowed">
+                    <div class="text-gray-500" data-icon="Clock" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
                           d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"
                         ></path>
                       </svg>
                     </div>
-                    <p class="text-white text-sm font-medium leading-normal">Availability</p>
+                    <p class="text-gray-500 text-sm font-medium leading-normal">Availability (Soon)</p>
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-3 px-3 py-2">
+              <div class="flex flex-col gap-1 mt-auto"> <!-- Pushes settings and logout to bottom -->
+                <a href="<?php echo BASE_URL . '/dashboardAdmin.php?tab=settings'; ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#4a4321] text-white <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'settings') ? 'bg-[#4a4321]' : ''; ?>">
                   <div class="text-white" data-icon="Gear" data-size="24px" data-weight="regular">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                       <path
@@ -87,155 +100,58 @@
                     </svg>
                   </div>
                   <p class="text-white text-sm font-medium leading-normal">Settings</p>
-                </div>
+                </a>
+                 <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#4a4321] text-white">
+                    <div class="text-white" data-icon="SignOut" data-size="24px" data-weight="regular">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M112,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h56a8,8,0,0,1,0,16H48V208h56A8,8,0,0,1,112,216Zm109.66-93.66-48-48a8,8,0,0,0-11.32,11.32L196.69,120H104a8,8,0,0,0,0,16h92.69l-34.35,34.34a8,8,0,0,0,11.32,11.32l48-48A8,8,0,0,0,221.66,122.34Z"></path></svg>
+                    </div>
+                    <p class="text-sm font-medium leading-normal">Logout</p>
+                </a>
               </div>
             </div>
           </div>
-          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Dashboard</p></div>
-            <div class="flex flex-wrap gap-4 p-4">
-              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#4a4321]">
-                <p class="text-white text-base font-medium leading-normal">Total Appointments</p>
-                <p class="text-white tracking-light text-2xl font-bold leading-tight">250</p>
-              </div>
-              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#4a4321]">
-                <p class="text-white text-base font-medium leading-normal">Completed Appointments</p>
-                <p class="text-white tracking-light text-2xl font-bold leading-tight">200</p>
-              </div>
-              <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#4a4321]">
-                <p class="text-white text-base font-medium leading-normal">Pending Appointments</p>
-                <p class="text-white tracking-light text-2xl font-bold leading-tight">50</p>
-              </div>
-            </div>
-            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Appointments</h2>
-            <div class="px-4 py-3 @container">
-              <div class="flex overflow-hidden rounded-lg border border-[#6a5f2f] bg-[#232010]">
-                <table class="flex-1">
-                  <thead>
-                    <tr class="bg-[#353017]">
-                      <th class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Date</th>
-                      <th class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Time</th>
-                      <th class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Client</th>
-                      <th class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Vehicle</th>
-                      <th class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Service</th>
-                      <th class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720 px-4 py-3 text-left text-white w-60 text-sm font-medium leading-normal">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr class="border-t border-t-[#6a5f2f]">
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        2024-03-15
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">10:00 AM</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Ethan Carter
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">Sedan</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Oil Change
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#4a4321] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">Scheduled</span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr class="border-t border-t-[#6a5f2f]">
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        2024-03-15
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">11:30 AM</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Olivia Bennett
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">SUV</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Brake Inspection
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#4a4321] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">Scheduled</span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr class="border-t border-t-[#6a5f2f]">
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        2024-03-16
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">09:00 AM</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Noah Thompson
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">Truck</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Tire Rotation
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#4a4321] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">Scheduled</span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr class="border-t border-t-[#6a5f2f]">
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        2024-03-16
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">01:00 PM</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Ava Harper
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">Sedan</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Alignment
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#4a4321] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">Scheduled</span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr class="border-t border-t-[#6a5f2f]">
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        2024-03-17
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">10:00 AM</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Liam Foster
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">SUV</td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600 h-[72px] px-4 py-2 w-[400px] text-[#cdc28e] text-sm font-normal leading-normal">
-                        Full Inspection
-                      </td>
-                      <td class="table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#4a4321] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">Scheduled</span>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <style>
-                          @container(max-width:120px){.table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-120{display: none;}}
-                @container(max-width:240px){.table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-240{display: none;}}
-                @container(max-width:360px){.table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-360{display: none;}}
-                @container(max-width:480px){.table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-480{display: none;}}
-                @container(max-width:600px){.table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-600{display: none;}}
-                @container(max-width:720px){.table-d5a0654e-a4ec-4fb4-9eb9-f879ca34e96b-column-720{display: none;}}
-              </style>
-            </div>
+          <!-- Main Content Area -->
+          <div class="layout-content-container flex flex-col flex-1 max-w-full sm:max-w-[calc(100%-16rem-0.25rem)] md:max-w-[calc(100%-20rem-0.25rem)]">
+             <?php echo display_flash_message(); ?>
+            <?php
+                // Determine which content to load based on 'tab' GET parameter
+                $current_tab = $_GET['tab'] ?? 'overview'; // Default to overview
+
+                switch ($current_tab) {
+                    case 'appointments':
+                        include __DIR__ . '/partials/admin_appointments.php';
+                        break;
+                    case 'add_booking':
+                        include __DIR__ . '/partials/admin_add_booking_form.php';
+                        break;
+                    case 'services':
+                        include __DIR__ . '/partials/admin_services.php';
+                        break;
+                    case 'users':
+                        include __DIR__ . '/partials/admin_users.php';
+                        break;
+                    // case 'staff':
+                    //     include __DIR__ . '/partials/admin_staff.php';
+                    //     break;
+                    // case 'availability':
+                    //     include __DIR__ . '/partials/admin_availability.php';
+                    //     break;
+                    case 'settings':
+                         include __DIR__ . '/partials/admin_settings.php'; // General admin settings if any
+                        break;
+                    case 'overview':
+                    default:
+                        include __DIR__ . '/partials/admin_overview.php';
+                        break;
+                }
+            ?>
           </div>
         </div>
+        <footer class="flex justify-center border-t border-solid border-t-[#4a4321] mt-auto">
+            <div class="flex max-w-[960px] flex-1 flex-col py-5 px-4">
+                <p class="text-[#cdc28e] text-xs sm:text-sm font-normal leading-normal text-center">© <?php echo date("Y"); ?> CN Auto Admin. All rights reserved.</p>
+            </div>
+        </footer>
       </div>
     </div>
   </body>

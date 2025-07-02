@@ -143,21 +143,90 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->execute()) {
                 $booking_id = $mysqli->insert_id;
                 $_SESSION['success_message'] = "Booking successful! Your appointment is pending confirmation. Booking ID: " . $booking_id;
+
+                // Fetch service name for email content
+                $service_name_email = "Selected Service";
+                $stmt_service = $mysqli->prepare("SELECT name FROM services WHERE id = ?");
+                if($stmt_service){
+                    $stmt_service->bind_param("i", $service_id);
+                    $stmt_service->execute();
+                    $result_service = $stmt_service->get_result();
+                    if($service_details_email = $result_service->fetch_assoc()){
+                        $service_name_email = $service_details_email['name'];
+                    }
+                    $stmt_service->close();
+                }
+
+                $client_email_for_notification = "";
+                $client_name_for_notification = "";
+
+                if (is_logged_in()) {
+                    $client_email_for_notification = $_SESSION['user_email'];
+                    $client_name_for_notification = $_SESSION['user_name'];
+                } else {
+                    $client_email_for_notification = $guest_email;
+                    $client_name_for_notification = $guest_name;
+                }
+
+                // Send Admin Notification Email
+                $admin_subject = "New Booking Received - ID: " . $booking_id;
+                $admin_message = "<h2>New Booking Notification</h2>
+                                  <p>A new booking has been made:</p>
+                                  <ul>
+                                    <li><strong>Booking ID:</strong> " . $booking_id . "</li>
+                                    <li><strong>Client Name:</strong> " . htmlspecialchars($client_name_for_notification) . "</li>
+                                    <li><strong>Client Email:</strong> " . htmlspecialchars($client_email_for_notification) . "</li>
+                                    <li><strong>Service:</strong> " . htmlspecialchars($service_name_email) . "</li>
+                                    <li><strong>Date:</strong> " . htmlspecialchars(format_date_display($booking_date)) . "</li>
+                                    <li><strong>Time:</strong> " . htmlspecialchars(format_time_display($booking_time)) . "</li>
+                                    <li><strong>Vehicle:</strong> " . htmlspecialchars($vehicle_make . ' ' . $vehicle_model . ' (' . $vehicle_year . ') - ' . $license_plate) . "</li>
+                                    <li><strong>Notes:</strong> " . nl2br(htmlspecialchars($notes ?? 'N/A')) . "</li>
+                                  </ul>
+                                  <p>Please review this booking in the admin dashboard.</p>";
+
+                if (!send_native_email(ADMIN_EMAIL, $admin_subject, $admin_message, FROM_EMAIL, FROM_NAME)) {
+                    error_log("Failed to send admin notification email for booking ID: " . $booking_id);
+                    // Optionally, you could add a message to $_SESSION for the admin to see on next login,
+                    // or handle this failure more gracefully if email is critical.
+                }
+
+                // Send Client Confirmation Email
+                if (!empty($client_email_for_notification)) {
+                    $client_subject = "Your Booking Confirmation - ID: " . $booking_id;
+                    $client_message = "<h2>Booking Confirmation</h2>
+                                       <p>Dear " . htmlspecialchars($client_name_for_notification) . ",</p>
+                                       <p>Thank you for your booking. Your appointment details are as follows:</p>
+                                       <ul>
+                                         <li><strong>Booking ID:</strong> " . $booking_id . "</li>
+                                         <li><strong>Service:</strong> " . htmlspecialchars($service_name_email) . "</li>
+                                         <li><strong>Date:</strong> " . htmlspecialchars(format_date_display($booking_date)) . "</li>
+                                         <li><strong>Time:</strong> " . htmlspecialchars(format_time_display($booking_time)) . "</li>
+                                         <li><strong>Vehicle:</strong> " . htmlspecialchars($vehicle_make . ' ' . $vehicle_model . ' (' . $vehicle_year . ') - ' . $license_plate) . "</li>
+                                         <li><strong>Status:</strong> Pending Confirmation</li>
+                                         <li><strong>Notes:</strong> " . nl2br(htmlspecialchars($notes ?? 'N/A')) . "</li>
+                                       </ul>
+                                       <p>We will notify you once your booking is confirmed by our team. If you have any questions, please contact us.</p>
+                                       <p>Thank you,<br>" . FROM_NAME . "</p>";
+                    if (!send_native_email($client_email_for_notification, $client_subject, $client_message, FROM_EMAIL, FROM_NAME)) {
+                        error_log("Failed to send client confirmation email for booking ID: " . $booking_id . " to " . $client_email_for_notification);
+                        // You might want to inform the user on the confirmation page that email sending failed.
+                        $_SESSION['warning_message'] = "Booking successful, but we couldn't send a confirmation email. Please note your Booking ID: " . $booking_id;
+                    }
+                }
+
                 // Redirect to a confirmation page or user's booking area
                 if (is_logged_in()) {
-                    redirect(BASE_URL . "/areacliente.php");
+                    redirect(BASE_URL . "/areacliente.php?tab=bookings");
                 } else {
-                    // For guests, maybe a simple success message on the booking page or a dedicated thank you page.
                     redirect(BASE_URL . "/bookinapp.php?success=true&booking_id=" . $booking_id);
                 }
+
             } else {
                 $_SESSION['error_message'] = "Booking failed: " . $stmt->error;
-                // Log error: error_log("Booking failed: " . $stmt->error);
             }
             $stmt->close();
         } else {
             $_SESSION['error_message'] = "Database error (prepare): " . $mysqli->error;
-             // Log error: error_log("Database error (prepare): " . $mysqli->error);
         }
     }
 

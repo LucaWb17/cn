@@ -11,13 +11,21 @@ if (!is_logged_in()) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id']; // Logged-in user's ID
+
+// Determine whose vehicles to fetch. Default to logged-in user.
+// If admin is viewing for a specific user (e.g., in admin_add_booking_form), use that user's ID.
+$user_id_to_fetch_vehicles = $user_id;
+if (is_admin() && isset($_GET['user_id_admin_view'])) {
+    $user_id_to_fetch_vehicles = (int)$_GET['user_id_admin_view'];
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Fetch all vehicles for the logged-in user
+    // Fetch all vehicles for the determined user
     $sql = "SELECT id, make, model, year, license_plate FROM vehicles WHERE user_id = ? ORDER BY make ASC, model ASC";
     if ($stmt = $mysqli->prepare($sql)) {
-        $stmt->bind_param("i", $user_id);
+        $stmt->bind_param("i", $user_id_to_fetch_vehicles); // Use the potentially overridden user ID
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
@@ -34,13 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : null;
 
+    // IMPORTANT: For POST actions (add, edit, delete), always operate on the LOGGED-IN user's vehicles,
+    // UNLESS it's an admin performing an action that explicitly allows managing other users' vehicles (not implemented here for vehicles).
+    // The GET request for fetching vehicles for admin view is separate.
+    // So, for POST, $user_id (logged-in user) is the one to use for ownership checks.
+
     $vehicle_id = isset($_POST['vehicle_id']) ? (int)$_POST['vehicle_id'] : null;
     $make = isset($_POST['make']) ? sanitize_input($_POST['make']) : null;
     $model = isset($_POST['model']) ? sanitize_input($_POST['model']) : null;
     $year = isset($_POST['year']) ? (int)$_POST['year'] : null;
-    $license_plate = isset($_POST['license_plate']) ? sanitize_input(strtoupper(str_replace(' ', '', $_POST['license_plate']))) : null; // Normalize license plate
+    $license_plate = isset($_POST['license_plate']) ? sanitize_input(strtoupper(str_replace(' ', '', $_POST['license_plate']))) : null;
 
-    // Basic Validation
+    // Basic Validation (applies to the logged-in user managing their own vehicles)
     $errors = [];
     if (empty($make)) $errors[] = "Make is required.";
     if (empty($model)) $errors[] = "Model is required.";

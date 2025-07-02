@@ -69,6 +69,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response['message'] = 'Database error (prepare): ' . $mysqli->error;
         }
 
+    } elseif ($action === 'delete_booking') {
+        if (!$booking_id) { // Should have been caught earlier, but good to double check
+            $response['message'] = 'Booking ID is required for deletion.';
+            echo json_encode($response);
+            exit;
+        }
+        // Optional: Add any other checks here, e.g., cannot delete 'completed' bookings older than X days, etc.
+        // For now, we allow deletion of any booking by admin.
+
+        $sql_delete = "DELETE FROM bookings WHERE id = ?";
+        if ($stmt_delete = $mysqli->prepare($sql_delete)) {
+            $stmt_delete->bind_param("i", $booking_id);
+            if ($stmt_delete->execute()) {
+                if ($stmt_delete->affected_rows > 0) {
+                    $response['success'] = true;
+                    $response['message'] = 'Booking deleted successfully.';
+                } else {
+                    $response['message'] = 'Booking not found or already deleted.';
+                }
+            } else {
+                $response['message'] = 'Failed to delete booking: ' . $stmt_delete->error;
+            }
+            $stmt_delete->close();
+        } else {
+            $response['message'] = 'Database error (prepare delete): ' . $mysqli->error;
+        }
+
     } else {
         $response['message'] = 'Invalid action.';
     }
