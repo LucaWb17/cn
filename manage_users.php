@@ -71,6 +71,66 @@ if ($stmt = $mysqli->prepare($sql)) {
         } else {
             $response['message'] = 'Database error (prepare update role): ' . $mysqli->error;
         }
+    } elseif ($action === 'admin_change_own_password') {
+        if (!is_admin()) { // Redundant if require_admin() is at the top, but good for specific action check
+            $response['message'] = "Unauthorized action.";
+            echo json_encode($response);
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id']; // Admin's own ID
+        $current_password = $_POST['current_password'] ?? '';
+        $new_password = $_POST['new_password'] ?? '';
+        $confirm_new_password = $_POST['confirm_new_password'] ?? '';
+
+        $response['errors'] = [];
+
+        if (empty($current_password)) $response['errors']['current_password'] = "Current password is required.";
+        if (empty($new_password)) $response['errors']['new_password'] = "New password is required.";
+        else if (strlen($new_password) < 6) $response['errors']['new_password'] = "New password must be at least 6 characters.";
+        if ($new_password !== $confirm_new_password) $response['errors']['confirm_new_password'] = "New passwords do not match.";
+
+        if (empty($response['errors'])) {
+            $sql_get_current_pass = "SELECT password FROM users WHERE id = ?";
+            if ($stmt_get = $mysqli->prepare($sql_get_current_pass)) {
+                $stmt_get->bind_param("i", $user_id);
+                $stmt_get->execute();
+                $result_get = $stmt_get->get_result();
+                if ($user_data = $result_get->fetch_assoc()) {
+                    if (password_verify($current_password, $user_data['password'])) {
+                        // Current password matches, proceed to update
+                        $hashed_new_pass = password_hash($new_password, PASSWORD_DEFAULT);
+                        $sql_update_pass = "UPDATE users SET password = ? WHERE id = ?";
+                        if ($stmt_update_p = $mysqli->prepare($sql_update_pass)) {
+                            $stmt_update_p->bind_param("si", $hashed_new_pass, $user_id);
+                            if ($stmt_update_p->execute()) {
+                                $response['success'] = true;
+                                $response['message'] = "Password changed successfully.";
+                                // Consider forcing logout for security, or updating session if relevant info changed
+                            } else {
+                                $response['message'] = "Error updating password: " . $stmt_update_p->error;
+                            }
+                            $stmt_update_p->close();
+                        } else {
+                             $response['message'] = "Database error (prepare password update): " . $mysqli->error;
+                        }
+                    } else {
+                        $response['errors']['current_password'] = "Incorrect current password.";
+                        $response['message'] = "Incorrect current password.";
+                    }
+                } else {
+                    $response['message'] = "User not found (should not happen for logged-in admin).";
+                }
+                $stmt_get->close();
+            } else {
+                $response['message'] = "Database error (prepare get current pass): " . $mysqli->error;
+            }
+        } else {
+            // Errors exist in validation
+            $response['message'] = "Please correct the errors.";
+        }
+
+
     } else {
         $response['message'] = 'Invalid action for POST request.';
     }
