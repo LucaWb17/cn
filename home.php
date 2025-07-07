@@ -34,9 +34,10 @@
           </a>
           <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
             <nav class="hidden sm:flex items-center gap-6">
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
               <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">Contact</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
             </nav>
             <div class="flex items-center gap-2">
                 <?php if (is_logged_in()): ?>
@@ -165,6 +166,7 @@
               <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 @[480px]:flex-row @[480px]:justify-around">
                 <a class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#fcdd53]" href="#">Privacy Policy</a>
                 <a class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#fcdd53]" href="#">Terms of Service</a>
+                <a class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact Us</a>
               </div>
               <p class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal">© <?php echo date("Y"); ?> CN Auto. All rights reserved.</p>
             </div>

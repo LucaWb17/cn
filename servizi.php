@@ -37,10 +37,10 @@
           </a>
           <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
             <nav class="hidden sm:flex items-center gap-6">
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] aria-[current=page]:text-[#fcdd53] aria-[current=page]:font-bold" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="page">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] aria-[current=page]:text-[#fcdd53] aria-[current=page]:font-bold" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
               <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">Contact</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
             </nav>
             <?php if (is_logged_in()): ?>
                 <a href="<?php echo is_admin() ? BASE_URL . '/dashboardAdmin.php' : BASE_URL . '/areacliente.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors"><?php echo is_admin() ? 'Admin' : 'My Account'; ?></a>
@@ -145,8 +145,13 @@
             </div>
           </div>
         </main>
-        <footer class="flex justify-center border-t border-solid border-t-[#4a4321] mt-auto">
-            <div class="flex max-w-[960px] flex-1 flex-col py-5 px-4">
+        <footer class="flex justify-center border-t border-solid border-t-[#4a4321] mt-auto py-5 bg-[#232010]">
+            <div class="flex max-w-[960px] flex-1 flex-col px-4">
+                 <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 @[480px]:flex-row @[480px]:justify-around mb-4">
+                    <a class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#fcdd53]" href="#">Privacy Policy</a>
+                    <a class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#fcdd53]" href="#">Terms of Service</a>
+                    <a class="text-[#cdc28e] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact Us</a>
+                </div>
                 <p class="text-[#cdc28e] text-xs sm:text-sm font-normal leading-normal text-center">© <?php echo date("Y"); ?> CN Auto. All rights reserved.</p>
             </div>
         </footer>
