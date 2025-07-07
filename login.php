@@ -115,13 +115,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </a>
           </div>
           <div class="flex flex-1 justify-end gap-2 sm:gap-8">
-            <div class="hidden sm:flex items-center gap-9">
-              <a class="text-white text-sm font-medium leading-normal" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
-            </div>
+            <nav class="hidden sm:flex items-center gap-9">
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="#">About</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
+            </nav>
             <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#483e23] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#483e23] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5a4e2e]"
             >
               <span class="truncate">Book Now</span>
             </a>
@@ -179,10 +180,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </form>
             <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
-                Don't have an account? <a href="<?php echo BASE_URL . '/createaccount.php'; ?>" class="underline">Sign Up</a>
+                Don't have an account? <a href="<?php echo BASE_URL . '/createaccount.php'; ?>" class="underline hover:text-[#f4c653]">Sign Up</a>
             </p>
           </div>
-        </div>
+        </main>
+        <footer class="flex justify-center border-t border-solid border-t-[#483e23] mt-auto py-5 bg-[#221d11]">
+            <div class="flex max-w-[960px] flex-1 flex-col px-4">
+                 <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 @[480px]:flex-row @[480px]:justify-around mb-4">
+                    <a class="text-[#caba91] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#f4c653]" href="#">Privacy Policy</a>
+                    <a class="text-[#caba91] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#f4c653]" href="#">Terms of Service</a>
+                    <a class="text-[#caba91] text-sm sm:text-base font-normal leading-normal min-w-32 sm:min-w-40 hover:text-[#f4c653]" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact Us</a>
+                </div>
+                <p class="text-[#caba91] text-xs sm:text-sm font-normal leading-normal text-center">© <?php echo date("Y"); ?> CN Auto. All rights reserved.</p>
+            </div>
+        </footer>
       </div>
     </div>
   </body>
