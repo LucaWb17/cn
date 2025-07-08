@@ -68,17 +68,9 @@
 </div>
 
 <script>
-function escapeHtml(unsafe) { // Rinominata per evitare conflitti se già definita altrove globalmente
+function escapeHtml(unsafe) {
     if (unsafe === null || typeof unsafe === 'undefined') return '';
     return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-function formatDateForDisplayUsers(dateStr) {
-    if (!dateStr) return 'N/A';
-    const [year, month, day] = dateStr.split('-');
-    const dateObj = new Date(year, parseInt(month, 10) - 1, day);
-    if (isNaN(dateObj.getTime())) return dateStr;
-    return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function fetchUsers() {
@@ -93,7 +85,7 @@ function fetchUsers() {
                 tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-400">Error: ${escapeHtml(data.error)}</td></tr>`;
                 return;
             }
-            if (data.data && data.data.length > 0) {
+            if (data.success && data.data && data.data.length > 0) {
                 data.data.forEach(user => {
                     const row = tableBody.insertRow();
                     row.innerHTML = `
@@ -105,7 +97,7 @@ function fetchUsers() {
                                 ${escapeHtml(user.role)}
                             </span>
                         </td>
-                        <td class="px-3 py-4 text-xs sm:text-sm whitespace-nowrap hidden @[800px]:table-cell">${formatDateForDisplayUsers(user.created_at_formatted.split(' ')[0])}</td>
+                        <td class="px-3 py-4 text-xs sm:text-sm whitespace-nowrap hidden @[800px]:table-cell">${escapeHtml(user.created_at_formatted)}</td>
                         <td class="px-3 py-4 text-xs sm:text-sm whitespace-nowrap user-actions-cell-${user.id}">
                             <select class="role-select text-xs p-1.5 rounded-md border-gray-600 bg-[#232010] text-white focus:ring-[#fcdd53] focus:border-[#fcdd53]" data-user-id="${user.id}" data-current-role="${user.role}">
                                 <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
@@ -209,13 +201,13 @@ document.getElementById('communicationForm').addEventListener('submit', function
     submitButton.disabled = true;
     submitButton.textContent = 'Sending...';
     messageDiv.textContent = 'Processing...';
-    messageDiv.className = 'p-3 mb-2 rounded-md text-sm bg-yellow-600/30 border border-yellow-500 text-yellow-300'; // Giallo per processing
+    messageDiv.className = 'p-3 mb-2 rounded-md text-sm bg-yellow-600/30 border border-yellow-500 text-yellow-300';
     messageDiv.classList.remove('hidden');
 
     document.getElementById('error_communication_subject').textContent = '';
     document.getElementById('error_communication_message').textContent = '';
 
-    fetch('<?php echo BASE_URL . "/admin_send_communication.php"; ?>', { // Script da creare
+    fetch('<?php echo BASE_URL . "/admin_send_communication.php"; ?>', {
         method: 'POST',
         body: formData
     })
@@ -225,7 +217,7 @@ document.getElementById('communicationForm').addEventListener('submit', function
             messageDiv.textContent = data.message || 'Message sent successfully!';
             messageDiv.className = 'p-3 mb-2 rounded-md text-sm bg-green-600/30 border border-green-500 text-green-300';
             this.reset();
-            setTimeout(() => { // Chiude la modale e mostra il flash globale
+            setTimeout(() => {
                  closeCommunicationModal();
                  showUserManagementFlash(data.message || 'Message sent successfully!', 'success');
             }, 1500);
