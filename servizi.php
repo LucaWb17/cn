@@ -18,10 +18,11 @@
         require_once 'config.php';
         require_once 'utils/functions.php';
         $all_services = get_all_services($mysqli); // Fetch all services
+        $page_is_active = basename($_SERVER['PHP_SELF']);
     ?>
     <div class="relative flex size-full min-h-screen flex-col bg-[#232010] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-4 sm:px-10 py-3">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-4 sm:px-10 py-3 relative">
           <a href="<?php echo BASE_URL . '/home.php'; ?>" class="flex items-center gap-4 text-white">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,26 +37,56 @@
             <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
           </a>
           <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
+            <!-- Desktop Navigation -->
             <nav class="hidden sm:flex items-center gap-6">
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] aria-[current=page]:text-[#fcdd53] aria-[current=page]:font-bold" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo ($page_is_active == 'home.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo ($page_is_active == 'servizi.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
               <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo ($page_is_active == 'contact.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact</a>
             </nav>
-            <?php if (is_logged_in()): ?>
-                <a href="<?php echo is_admin() ? BASE_URL . '/dashboardAdmin.php' : BASE_URL . '/areacliente.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors"><?php echo is_admin() ? 'Admin' : 'My Account'; ?></a>
-                <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a]">Logout</a>
-            <?php else: ?>
-                 <a href="<?php echo BASE_URL . '/login.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors">Log In</a>
-            <?php endif; ?>
-            <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
-              class="flex min-w-[80px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#fcdd53] text-[#232010] text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#fadc70]"
-            >
-              <span class="truncate">Book Now</span>
-            </a>
+            <div class="flex items-center gap-2">
+                 <!-- Mobile Menu Button -->
+                <button id="hamburger-button" class="sm:hidden text-white p-2 rounded-md hover:bg-[#4a4321] focus:outline-none focus:bg-[#4a4321]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <?php if (is_logged_in()): ?>
+                    <a href="<?php echo is_admin() ? BASE_URL . '/dashboardAdmin.php' : BASE_URL . '/areacliente.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors hidden sm:block"><?php echo is_admin() ? 'Admin' : 'My Account'; ?></a>
+                    <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a] hidden sm:flex">Logout</a>
+                <?php else: ?>
+                     <a href="<?php echo BASE_URL . '/login.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors hidden sm:block">Log In</a>
+                <?php endif; ?>
+                <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
+                  class="flex min-w-[80px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#fcdd53] text-[#232010] text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#fadc70]"
+                >
+                  <span class="truncate">Book Now</span>
+                </a>
+            </div>
           </div>
         </header>
-        <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+         <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden sm:hidden bg-[#2c281a] border-b border-[#4a4321] absolute top-[60px] left-0 right-0 z-50">
+            <nav class="flex flex-col items-center gap-2 px-2 pt-2 pb-3 space-y-1">
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo ($page_is_active == 'home.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo ($page_is_active == 'servizi.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md" href="#">About</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo ($page_is_active == 'contact.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact</a>
+
+                <?php if (is_logged_in()): ?>
+                    <?php if (is_admin()): ?>
+                         <a href="<?php echo BASE_URL . '/dashboardAdmin.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Admin Dashboard</a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL . '/areacliente.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">My Account</a>
+                    <?php endif; ?>
+                    <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Logout</a>
+                <?php else: ?>
+                    <a href="<?php echo BASE_URL . '/login.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Log In</a>
+                    <a href="<?php echo BASE_URL . '/createaccount.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Sign Up</a>
+                <?php endif; ?>
+                 <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>" class="block w-full text-center mt-2 bg-[#fcdd53] text-[#232010] hover:bg-[#fadc70] text-base font-bold p-2 rounded-md">Book Now</a>
+            </nav>
+        </div>
+
+        <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5 pt-20 sm:pt-5"> <!-- Aggiunto padding top per mobile per evitare sovrapposizione con menu -->
           <div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
             <div class="flex flex-wrap justify-between gap-3 p-4">
               <div class="flex min-w-72 flex-col gap-3">
@@ -157,5 +188,17 @@
         </footer>
       </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (hamburgerButton && mobileMenu) {
+                hamburgerButton.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
   </body>
 </html>
