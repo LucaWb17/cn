@@ -1,12 +1,13 @@
-<?php
+<?php // DEVE ESSERE LA PRIMISSIMA COSA NEL FILE, SENZA SPAZI O LINEE PRIMA
 require_once 'config.php';
 require_once 'auth_check.php';
-require_admin(); // Only admins can access any part of this script
+require_admin(); // Solo gli admin possono accedere a qualsiasi parte di questo script
 
+// Imposta Content-Type a JSON per tutte le risposte di questo script
 header('Content-Type: application/json');
 
-// Handling GET request to fetch all users (for populating the admin user table)
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['action'])) { // No specific 'action' for listing
+// Gestione richiesta GET per elencare tutti gli utenti
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['action'])) {
     $response = ['success' => false, 'data' => [], 'error' => null];
 
     $sql = "SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC";
@@ -14,47 +15,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['action'])) { // No spe
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
-                // Format date directly in PHP for consistency
+                // Utilizza la funzione di formattazione data da functions.php
                 $row['created_at_formatted'] = format_datetime_display($row['created_at'], "Y-m-d H:i");
                 $response['data'][] = $row;
             }
             $response['success'] = true;
         } else {
             $response['error'] = 'Failed to fetch users: ' . $stmt->error;
+            error_log('Failed to fetch users: ' . $stmt->error); // Log dell'errore
         }
         $stmt->close();
     } else {
         $response['error'] = 'Database error (prepare GET users): ' . $mysqli->error;
+        error_log('Database error (prepare GET users): ' . $mysqli->error); // Log dell'errore
     }
     echo json_encode($response);
     $mysqli->close();
     exit;
 }
 
-// Handling POST requests for actions
-$response = ['success' => false, 'message' => '', 'errors' => []]; // Default for POST actions
+// Gestione richieste POST per azioni specifiche
+$response = ['success' => false, 'message' => '', 'errors' => []]; // Default per risposte azioni POST
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : null;
-    $user_id_to_manage = isset($_POST['user_id']) ? (int)$_POST['user_id'] : null;
-    // $new_role is specific to 'update_role' action
-    // Password fields are specific to 'admin_change_own_password' action
 
     if ($action === 'update_role') {
+        $user_id_to_manage = isset($_POST['user_id']) ? (int)$_POST['user_id'] : null;
         $new_role = isset($_POST['new_role']) ? sanitize_input($_POST['new_role']) : null;
+
         if (!$user_id_to_manage || !$new_role) {
             $response['message'] = 'User ID and new role are required.';
         } elseif (!in_array($new_role, ['user', 'admin'])) {
             $response['message'] = 'Invalid role specified.';
         } else {
-            // Security check: Prevent admin from accidentally removing their own admin role if they are the only admin
             if ($user_id_to_manage === $_SESSION['user_id'] && $new_role === 'user') {
                 $sql_count_admins = "SELECT COUNT(*) as admin_count FROM users WHERE role = 'admin'";
                 $admin_count_result = $mysqli->query($sql_count_admins);
                 $admin_count_row = $admin_count_result->fetch_assoc();
                 if ($admin_count_row && $admin_count_row['admin_count'] <= 1) {
                     $response['message'] = 'Cannot remove admin role from the only administrator.';
-                    echo json_encode($response); // Output immediately and exit
+                    echo json_encode($response);
                     $mysqli->close();
                     exit;
                 }
@@ -72,15 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     $response['message'] = 'Failed to update user role: ' . $stmt_update->error;
+                    error_log('Failed to update user role: ' . $stmt_update->error);
                 }
                 $stmt_update->close();
             } else {
                 $response['message'] = 'Database error (prepare update role): ' . $mysqli->error;
+                error_log('Database error (prepare update role): ' . $mysqli->error);
             }
         }
     } elseif ($action === 'admin_change_own_password') {
-        // This action is for the logged-in admin to change their own password
-        $current_user_id = $_SESSION['user_id']; // Admin's own ID
+        $current_user_id = $_SESSION['user_id'];
         $current_password = $_POST['current_password'] ?? '';
         $new_password = $_POST['new_password'] ?? '';
         $confirm_new_password = $_POST['confirm_new_password'] ?? '';
@@ -107,24 +109,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $response['message'] = "Password changed successfully.";
                             } else {
                                 $response['message'] = "Error updating password: " . $stmt_update_p->error;
+                                error_log("Error updating admin password: " . $stmt_update_p->error);
                             }
                             $stmt_update_p->close();
                         } else {
                              $response['message'] = "Database error (prepare password update): " . $mysqli->error;
+                             error_log("DB error (prepare admin password update): " . $mysqli->error);
                         }
                     } else {
                         $response['errors']['current_password'] = "Incorrect current password.";
                         $response['message'] = "Incorrect current password.";
                     }
                 } else {
-                    $response['message'] = "User not found."; // Should not happen for a logged-in admin
+                    $response['message'] = "User not found.";
                 }
                 $stmt_get->close();
             } else {
                 $response['message'] = "Database error (prepare get current pass): " . $mysqli->error;
+                error_log("DB error (prepare get admin current pass): " . $mysqli->error);
             }
         } else {
-            $response['message'] = "Please correct the errors."; // General message if specific field errors exist
+            $response['message'] = "Please correct the errors.";
         }
     } else {
         $response['message'] = 'Invalid action specified for POST request.';
@@ -134,10 +139,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Fallback for any other request method or if script is accessed directly without proper method
-// (though the GET handler above should catch most direct accesses)
-// $response['message'] = 'Invalid request method or no action specified.';
-// echo json_encode($response);
-// $mysqli->close();
-// exit;
+// Se si arriva qui, non è né un GET per la lista, né un POST valido.
+// Questo non dovrebbe accadere se il frontend fa le chiamate corrette.
+$response_fallback = ['success' => false, 'message' => 'Invalid request.'];
+echo json_encode($response_fallback);
+$mysqli->close();
+exit;
 ?>
