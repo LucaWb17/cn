@@ -33,13 +33,22 @@
             <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN</h2>
           </a>
           <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
+            <!-- Desktop Navigation -->
             <nav class="hidden sm:flex items-center gap-6">
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
               <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact</a>
             </nav>
+
             <div class="flex items-center gap-2">
+                <!-- Mobile Menu Button -->
+                <button id="hamburger-button" class="sm:hidden text-white p-2 rounded-md hover:bg-[#4a4321] focus:outline-none focus:bg-[#4a4321]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+
                 <?php if (is_logged_in()): ?>
                     <?php if (is_admin()): ?>
                         <a href="<?php echo BASE_URL . '/dashboardAdmin.php'; ?>" class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] px-3 py-2 rounded-lg bg-opacity-50 hover:bg-opacity-75 transition-colors">Admin</a>
@@ -63,6 +72,30 @@
             </div>
           </div>
         </header>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden sm:hidden bg-[#2c281a] border-b border-[#4a4321]">
+            <nav class="flex flex-col items-center gap-2 px-2 pt-2 pb-3 space-y-1">
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md" href="#">About</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact</a>
+
+                <?php if (is_logged_in()): ?>
+                    <?php if (is_admin()): ?>
+                         <a href="<?php echo BASE_URL . '/dashboardAdmin.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Admin Dashboard</a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL . '/areacliente.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">My Account</a>
+                    <?php endif; ?>
+                    <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Logout</a>
+                <?php else: ?>
+                    <a href="<?php echo BASE_URL . '/login.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Log In</a>
+                    <a href="<?php echo BASE_URL . '/createaccount.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Sign Up</a>
+                <?php endif; ?>
+                 <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>" class="block w-full text-center mt-2 bg-[#fcdd53] text-[#232010] hover:bg-[#fadc70] text-base font-bold p-2 rounded-md">Book Now</a>
+            </nav>
+        </div>
+
         <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
           <div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
             <?php echo display_flash_message(); ?>
@@ -174,5 +207,25 @@
         </footer>
       </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (hamburgerButton && mobileMenu) {
+                hamburgerButton.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('hidden');
+                    // Opzionale: cambiare l'icona dell'hamburger in una "X" quando il menu è aperto
+                    // Questo richiede di avere due icone SVG o di manipolare i path dell'SVG esistente.
+                    // Esempio semplice di cambio testo (non ideale per icone SVG pure):
+                    // if (mobileMenu.classList.contains('hidden')) {
+                    //     hamburgerButton.innerHTML = '<svg>...</svg>'; // Icona hamburger
+                    // } else {
+                    //     hamburgerButton.innerHTML = '<svg>...</svg>'; // Icona X
+                    // }
+                });
+            }
+        });
+    </script>
   </body>
 </html>

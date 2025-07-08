@@ -16,18 +16,19 @@
   <body>
     <?php
         require_once 'config.php';
-        require_once 'auth_check.php'; // Redirects if not logged in
+        require_once 'auth_check.php';
         require_once 'utils/functions.php';
 
-        // If the user is an admin, redirect to admin dashboard
         if (is_admin()) {
             redirect(BASE_URL . '/dashboardAdmin.php');
         }
         $user_name = $_SESSION['user_name'] ?? 'Customer';
+        $page_is_active = basename($_SERVER['PHP_SELF']);
+        $current_client_tab = $_GET['tab'] ?? 'overview';
     ?>
     <div class="relative flex size-full min-h-screen flex-col bg-[#232010] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-4 sm:px-10 py-3">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#4a4321] px-4 sm:px-10 py-3 relative">
           <a href="<?php echo BASE_URL . '/home.php'; ?>" class="flex items-center gap-4 text-white">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,17 +43,22 @@
             <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
           </a>
           <div class="flex flex-1 justify-end items-center gap-2 sm:gap-6">
-            <nav class="hidden sm:flex items-center gap-6">
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
+            <!-- Desktop Navigation (Hidden on sm, shown on md and up) -->
+            <nav class="hidden md:flex items-center gap-6">
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo ($page_is_active == 'home.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
               <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/bookinapp.php'; ?>">Book</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo ($page_is_active == 'servizi.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
               <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
+              <a class="text-white text-sm font-medium leading-normal hover:text-[#fcdd53] <?php echo ($page_is_active == 'contact.php') ? 'text-[#fcdd53] font-bold' : ''; ?>" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact</a>
             </nav>
             <!-- User avatar and logout -->
             <div class="flex items-center gap-2">
+                 <!-- Mobile Menu Button (Visible on sm and down) -->
+                <button id="hamburger-button-cliente" class="md:hidden text-white p-2 rounded-md hover:bg-[#4a4321] focus:outline-none focus:bg-[#4a4321]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
                 <a href="<?php echo BASE_URL . '/logout.php'; ?>"
-                    class="flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a]">
+                    class="hidden md:flex min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-3 bg-[#4a4321] text-white text-xs sm:text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5f552a]">
                     Logout
                 </a>
                 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
@@ -62,9 +68,22 @@
             </div>
           </div>
         </header>
-        <div class="flex flex-col sm:flex-row gap-1 px-2 sm:px-6 flex-1 justify-center py-5">
+         <!-- Mobile Menu for Area Cliente -->
+        <div id="mobile-menu-cliente" class="hidden md:hidden bg-[#2c281a] border-b border-[#4a4321] absolute top-[60px] left-0 right-0 z-50">
+            <nav class="flex flex-col items-center gap-2 px-2 pt-2 pb-3 space-y-1">
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo ($page_is_active == 'home.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/home.php'; ?>">Home</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md" href="<?php echo BASE_URL . '/bookinapp.php'; ?>">Book Appointment</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo ($page_is_active == 'servizi.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/servizi.php'; ?>">Services</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md" href="#">About</a>
+              <a class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md <?php echo ($page_is_active == 'contact.php') ? 'text-[#fcdd53] font-bold bg-[#4a4321]' : ''; ?>" href="<?php echo BASE_URL . '/contact.php'; ?>">Contact</a>
+              <hr class="w-full border-t border-[#4a4321] my-2">
+              <a href="<?php echo BASE_URL . '/logout.php'; ?>" class="block w-full text-center text-white text-base font-medium leading-normal hover:text-[#fcdd53] hover:bg-[#4a4321] p-2 rounded-md">Logout</a>
+            </nav>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-1 px-2 sm:px-6 flex-1 justify-center py-5 pt-20 md:pt-5"> <!-- Adjusted padding top for mobile -->
           <!-- Sidebar -->
-          <div class="layout-content-container flex flex-col w-full sm:w-64 md:w-80 bg-[#232010] p-4 rounded-lg sm:min-h-[700px]">
+          <div class="layout-content-container flex flex-col w-full sm:w-64 md:w-80 bg-[#232010] p-4 rounded-lg sm:min-h-[700px] mb-4 sm:mb-0">
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col mb-4">
                     <h1 class="text-white text-lg font-medium leading-normal"><?php echo htmlspecialchars($user_name); ?></h1>
@@ -149,5 +168,21 @@
         </footer>
       </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.getElementById('hamburger-button-cliente'); // ID Unico
+            const mobileMenu = document.getElementById('mobile-menu-cliente'); // ID Unico
+
+            if (hamburgerButton && mobileMenu) {
+                hamburgerButton.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Gestione tab per sidebar (se necessario, ma lo switch PHP gestisce il contenuto)
+            // Potresti aggiungere JS per cambiare l'URL con ?tab= e ricaricare, o usare AJAX qui
+            // Ma per ora, i link della sidebar ricaricano la pagina con il parametro GET corretto
+        });
+    </script>
   </body>
 </html>
