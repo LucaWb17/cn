@@ -1,6 +1,7 @@
 <?php // DEVE ESSERE LA PRIMISSIMA COSA NEL FILE, SENZA SPAZI O LINEE PRIMA
 require_once 'config.php';
 require_once 'auth_check.php';
+require_once 'utils/functions.php'; // Added to include helper functions
 require_admin(); // Solo gli admin possono accedere a qualsiasi parte di questo script
 
 // Imposta Content-Type a JSON per tutte le risposte di questo script
