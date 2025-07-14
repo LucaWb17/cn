@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php'; // Includes session_start() via config.php
+require_once 'utils/functions.php'; // Includes format_date_display() and other helpers
 
 $service_id = $vehicle_make = $vehicle_model = $vehicle_year = $license_plate = $booking_date = $booking_time = "";
 $guest_name = $guest_email = $guest_phone = "";
