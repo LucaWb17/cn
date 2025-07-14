@@ -184,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                   </ul>
                                   <p>Please review this booking in the admin dashboard.</p>";
 
-                if (!send_native_email(ADMIN_EMAIL, $admin_subject, $admin_message, FROM_EMAIL, FROM_NAME)) {
+                if (!send_email(ADMIN_EMAIL, $admin_subject, $admin_message, FROM_EMAIL, FROM_NAME)) {
                     error_log("Failed to send admin notification email for booking ID: " . $booking_id);
                     // Optionally, you could add a message to $_SESSION for the admin to see on next login,
                     // or handle this failure more gracefully if email is critical.

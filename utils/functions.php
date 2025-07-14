@@ -113,44 +113,70 @@ function format_time_display($time_str, $format = "h:i A") {
 
 // Add more utility functions as needed, e.g., for pagination, email sending, etc.
 
-// Function to send email using PHP's native mail() function
-function send_native_email($to, $subject, $html_message, $from_email, $from_name) {
-    // To send HTML mail, the Content-type header must be set
-    $headers  = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-    // More headers
-    $headers .= 'From: ' . $from_name . ' <' . $from_email . '>' . "\r\n";
-    // $headers .= 'Cc: myboss@example.com' . "\r\n"; // Optional CC
-    // $headers .= 'Bcc: mybackup@example.com' . "\r\n"; // Optional BCC
+// Since we are not using Composer's autoloader, we need to require the files manually.
+// The paths must be relative to this file's location (`utils/`).
+require_once __DIR__ . '/../vendor/phpmailer/phpmailer/src/Exception.php';
+require_once __DIR__ . '/../vendor/phpmailer/phpmailer/src/PHPMailer.php';
+require_once __DIR__ . '/../vendor/phpmailer/phpmailer/src/SMTP.php';
 
-    // Add some basic styling to the HTML message
-    $styled_message = "
-    <html>
-    <head>
-      <title>" . htmlspecialchars($subject) . "</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        h2 { color: #2c3e50; }
-        .footer { margin-top: 20px; font-size: 0.9em; text-align: center; color: #777; }
-      </style>
-    </head>
-    <body>
-      <div class='container'>
-        " . $html_message . "
-        <div class='footer'>
-          <p>This is an automated message from " . htmlspecialchars($from_name) . ".</p>
-        </div>
-      </div>
-    </body>
-    </html>";
 
-    if (mail($to, $subject, $styled_message, $headers)) {
+// Function to send email using PHPMailer
+function send_email($to, $subject, $html_message, $from_email, $from_name) {
+    $mail = new PHPMailer(true); // Passing `true` enables exceptions
+
+    try {
+        // Server settings
+        // $mail->SMTPDebug = 2; // Enable verbose debug output for troubleshooting
+        $mail->isSMTP();                                      // Set mailer to use SMTP
+        $mail->Host       = SMTP_HOST;                        // Specify main and backup SMTP servers
+        $mail->SMTPAuth   = true;                             // Enable SMTP authentication
+        $mail->Username   = SMTP_USERNAME;                    // SMTP username
+        $mail->Password   = SMTP_PASSWORD;                    // SMTP password
+        $mail->SMTPSecure = SMTP_SECURE;                       // Enable TLS/SSL encryption
+        $mail->Port       = SMTP_PORT;                        // TCP port to connect to
+
+        // Recipients
+        $mail->setFrom($from_email, $from_name);
+        $mail->addAddress($to);     // Add a recipient
+
+        // Content
+        $mail->isHTML(true);                                  // Set email format to HTML
+        $mail->Subject = $subject;
+
+        // Add some basic styling to the HTML message
+        $styled_message = "
+        <html>
+        <head>
+          <title>" . htmlspecialchars($subject) . "</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+            h2 { color: #2c3e50; }
+            .footer { margin-top: 20px; font-size: 0.9em; text-align: center; color: #777; }
+          </style>
+        </head>
+        <body>
+          <div class='container'>
+            " . $html_message . "
+            <div class='footer'>
+              <p>This is an automated message from " . htmlspecialchars($from_name) . ".</p>
+            </div>
+          </div>
+        </body>
+        </html>";
+
+        $mail->Body    = $styled_message;
+        // Create a plain text version of the email (for clients that don't support HTML)
+        $mail->AltBody = strip_tags(str_replace("<br>", "\n", $html_message));
+
+        $mail->send();
         return true;
-    } else {
-        // Basic error logging, actual delivery success is not guaranteed by mail() returning true.
-        error_log("Email sending failed using mail(): To: $to, Subject: $subject");
+    } catch (Exception $e) {
+        // Log the detailed error message from PHPMailer
+        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
         return false;
     }
 }

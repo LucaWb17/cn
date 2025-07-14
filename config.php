@@ -73,4 +73,11 @@ define('ADMIN_EMAIL', 'admin@example.com'); // Replace with your admin email
 define('FROM_EMAIL', 'noreply@example.com'); // Replace with your desired "From" email
 define('FROM_NAME', 'CN Auto Booking');     // Replace with your desired "From" name
 
+// SMTP Configuration for PHPMailer
+define('SMTP_HOST', 'mail.example.com');      // Your SMTP server hostname (e.g., smtp.netsons.com)
+define('SMTP_USERNAME', 'your_email@example.com'); // Your SMTP username (full email address)
+define('SMTP_PASSWORD', 'your_smtp_password'); // Your SMTP password
+define('SMTP_PORT', 465);                         // SMTP port (e.g., 465 for SSL, 587 for TLS)
+define('SMTP_SECURE', 'ssl');                   // SMTP encryption type ('ssl' or 'tls')
+
 ?>
