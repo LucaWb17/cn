@@ -120,17 +120,6 @@
             ?>
 
             <?php if (!empty($all_services)): ?>
-                <?php
-                // Example: Group services by type for display if a 'type' field existed
-                // $services_by_type = [];
-                // foreach ($all_services as $service) {
-                //    $type = $service['type'] ?? 'General'; // Assuming a 'type' column
-                //    $services_by_type[$type][] = $service;
-                // }
-                // foreach ($services_by_type as $type_name => $services_in_type):
-                ?>
-                    <!-- <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"><?php echo htmlspecialchars(ucfirst($type_name)); ?> Services</h2> -->
-
                 <div class="space-y-6">
                     <?php foreach ($all_services as $service): ?>
                         <div class="p-4">
