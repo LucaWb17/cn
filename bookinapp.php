@@ -32,6 +32,12 @@
     unset($_SESSION['form_data'], $_SESSION['form_errors']);
 
     $selected_service_id = $form_data['service_id'] ?? ($_GET['service_id'] ?? '');
+
+    // Generate CSRF token
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    $csrf_token = $_SESSION['csrf_token'];
     ?>
     <div
       class="relative flex size-full min-h-screen flex-col bg-[#232010] dark group/design-root overflow-x-hidden"
@@ -73,6 +79,7 @@
             <?php echo display_flash_message(); ?>
 
             <form id="bookingForm" action="<?php echo BASE_URL . '/book_appointment.php'; ?>" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 <div class="form-group px-4 py-3">
                     <label for="service_id" class="block text-[#cdc28e] text-sm font-medium mb-1">Service</label>
                     <select name="service_id" id="service_id" required

@@ -9,6 +9,17 @@ $user_id = null;
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // CSRF Token Validation
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        // Token mismatch, handle the error (e.g., redirect or show an error message)
+        $_SESSION['error_message'] = "Invalid form submission. Please try again.";
+        redirect(BASE_URL . "/bookinapp.php");
+        exit;
+    }
+
+    // Invalidate the token to prevent reuse
+    unset($_SESSION['csrf_token']);
+
     // --- Form Data Collection and Basic Sanitization ---
     $service_id = isset($_POST['service_id']) ? (int)$_POST['service_id'] : null;
     $booking_date = isset($_POST['booking_date']) ? sanitize_input($_POST['booking_date']) : null;
