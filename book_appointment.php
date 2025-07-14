@@ -124,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $notes = isset($_POST['notes']) ? sanitize_input($_POST['notes']) : null;
 
             $stmt->bind_param(
-                "isssiissssss",
+                "isssiisssssss",
                 $user_id,
                 $guest_name,
                 $guest_email,
