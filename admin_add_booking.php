@@ -2,7 +2,7 @@
 require_once 'config.php';
 require_once 'auth_check.php';
 require_admin(); // Ensure only admin can access
-require_once 'utils/functions.php'; // For send_native_email and other utilities
+require_once 'utils/functions.php'; // For send_email and other utilities
 
 $response = ['success' => false, 'message' => '', 'errors' => []];
 
@@ -157,7 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <li><strong>Vehicle:</strong> " . htmlspecialchars($vehicle_make . ' ' . $vehicle_model . ' (' . $vehicle_year . ') - ' . $license_plate) . "</li>
                                     <li><strong>Notes:</strong> " . nl2br(htmlspecialchars($notes ?? 'N/A')) . "</li>
                                   </ul>";
-                send_native_email(ADMIN_EMAIL, $admin_subject, $admin_message_html, FROM_EMAIL, FROM_NAME);
+                send_email(ADMIN_EMAIL, $admin_subject, $admin_message_html, FROM_EMAIL, FROM_NAME);
 
                 // Client Notification (if email is available)
                 if (!empty($notify_client_email)) {
@@ -176,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                        </ul>
                                        <p>If you have any questions, please contact us.</p>
                                        <p>Thank you,<br>" . FROM_NAME . "</p>";
-                    send_native_email($notify_client_email, $client_subject, $client_message_html, FROM_EMAIL, FROM_NAME);
+                    send_email($notify_client_email, $client_subject, $client_message_html, FROM_EMAIL, FROM_NAME);
                 }
 
             } else {

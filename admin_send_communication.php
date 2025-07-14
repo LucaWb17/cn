@@ -2,7 +2,7 @@
 require_once 'config.php';
 require_once 'auth_check.php';
 require_admin(); // Solo gli admin possono inviare comunicazioni
-require_once 'utils/functions.php'; // Per send_native_email e sanitize_input
+require_once 'utils/functions.php'; // Per send_email e sanitize_input
 
 $response = ['success' => false, 'message' => '', 'errors' => []];
 
@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Invia l'email
         // FROM_EMAIL e FROM_NAME sono definiti in config.php
-        if (send_native_email($user_email, $subject, $email_html_content, FROM_EMAIL, FROM_NAME)) {
+        if (send_email($user_email, $subject, $email_html_content, FROM_EMAIL, FROM_NAME)) {
             $response['success'] = true;
             $response['message'] = 'Messaggio inviato con successo a ' . htmlspecialchars($user_name) . '.';
             // Qui si potrebbe aggiungere la logica per salvare la comunicazione nel database, se avessimo la tabella communications_log
