@@ -219,7 +219,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                        </ul>
                                        <p>We will notify you once your booking is confirmed by our team. If you have any questions, please contact us.</p>
                                        <p>Thank you,<br>" . FROM_NAME . "</p>";
-                    if (!send_native_email($client_email_for_notification, $client_subject, $client_message, FROM_EMAIL, FROM_NAME)) {
+                    if (!send_email($client_email_for_notification, $client_subject, $client_message, FROM_EMAIL, FROM_NAME)) {
                         error_log("Failed to send client confirmation email for booking ID: " . $booking_id . " to " . $client_email_for_notification);
                         // You might want to inform the user on the confirmation page that email sending failed.
                         $_SESSION['warning_message'] = "Booking successful, but we couldn't send a confirmation email. Please note your Booking ID: " . $booking_id;
