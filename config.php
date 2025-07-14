@@ -80,4 +80,12 @@ define('SMTP_PASSWORD', 'your_smtp_password'); // Your SMTP password
 define('SMTP_PORT', 465);                         // SMTP port (e.g., 465 for SSL, 587 for TLS)
 define('SMTP_SECURE', 'ssl');                   // SMTP encryption type ('ssl' or 'tls')
 
+// Include PHPMailer classes
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require __DIR__ . '/vendor/phpmailer/phpmailer/src/Exception.php';
+require __DIR__ . '/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+require __DIR__ . '/vendor/phpmailer/phpmailer/src/SMTP.php';
+
 ?>
