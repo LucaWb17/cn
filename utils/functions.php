@@ -113,15 +113,10 @@ function format_time_display($time_str, $format = "h:i A") {
 
 // Add more utility functions as needed, e.g., for pagination, email sending, etc.
 
+// PHPMailer classes are now included in config.php, so they are available globally.
+// We just need to use the namespace.
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
-// Since we are not using Composer's autoloader, we need to require the files manually.
-// The paths must be relative to this file's location (`utils/`).
-require_once __DIR__ . '/../vendor/phpmailer/phpmailer/src/Exception.php';
-require_once __DIR__ . '/../vendor/phpmailer/phpmailer/src/PHPMailer.php';
-require_once __DIR__ . '/../vendor/phpmailer/phpmailer/src/SMTP.php';
-
 
 // Function to send email using PHPMailer
 function send_email($to, $subject, $html_message, $from_email, $from_name) {
