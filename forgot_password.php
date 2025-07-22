@@ -1,17 +1,11 @@
 <?php
 require_once 'config.php';
 
-// If user is already logged in, redirect them
-if (is_logged_in()) {
-    if (is_admin()) {
-        redirect(BASE_URL . '/dashboardAdmin.php');
-    } else {
-        redirect(BASE_URL . '/areacliente.php');
-    }
-}
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-$email = $password = "";
-$email_err = $password_err = $login_err = "";
+$email = "";
+$email_err = $success_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -21,14 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = sanitize_input($_POST["email"]);
     }
 
-    if (empty(trim($_POST["password"]))) {
-        $password_err = "Please enter your password.";
-    } else {
-        $password = trim($_POST["password"]);
-    }
-
-    if (empty($email_err) && empty($password_err)) {
-        $sql = "SELECT id, name, email, password, role FROM users WHERE email = ?";
+    if (empty($email_err)) {
+        $sql = "SELECT id FROM users WHERE email = ?";
 
         if ($stmt = $mysqli->prepare($sql)) {
             $stmt->bind_param("s", $param_email);
@@ -38,47 +26,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->store_result();
 
                 if ($stmt->num_rows == 1) {
-                    $stmt->bind_result($id, $name, $db_email, $hashed_password, $role);
-                    if ($stmt->fetch()) {
-                        if (verify_password($password, $hashed_password)) {
-                            // Password is correct, so start a new session
-                            if (session_status() == PHP_SESSION_NONE) {
-                                session_start();
-                            }
+                    // User exists, generate a token
+                    $token = bin2hex(random_bytes(50));
+                    $expires = new DateTime('+1 hour');
+                    $expires_str = $expires->format('Y-m-d H:i:s');
 
-                            // Store data in session variables
-                            $_SESSION["user_id"] = $id;
-                            $_SESSION["user_name"] = $name;
-                            $_SESSION["user_email"] = $db_email;
-                            $_SESSION["user_role"] = $role;
+                    $update_sql = "UPDATE users SET reset_token = ?, reset_token_expires_at = ? WHERE email = ?";
 
-                            // Redirect user to appropriate page
-                            $redirect_url = isset($_SESSION['redirect_url']) ? $_SESSION['redirect_url'] : null;
-                            unset($_SESSION['redirect_url']); // Clear the stored URL
+                    if ($update_stmt = $mysqli->prepare($update_sql)) {
+                        $update_stmt->bind_param("sss", $token, $expires_str, $email);
+                        $update_stmt->execute();
 
-                            if ($role == 'admin') {
-                                redirect(BASE_URL . '/dashboardAdmin.php');
-                            } elseif ($redirect_url) {
-                                header("Location: " . $redirect_url); // Redirect to stored URL
-                                exit;
-                            }
-                             else {
-                                redirect(BASE_URL . '/areacliente.php');
-                            }
-                        } else {
-                            $login_err = "Invalid email or password.";
+                        // Send email
+                        $reset_link = BASE_URL . "/reset_password.php?token=" . $token;
+
+                        $mail = new PHPMailer(true);
+
+                        try {
+                            //Server settings
+                            $mail->isSMTP();
+                            $mail->Host       = SMTP_HOST;
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = SMTP_USERNAME;
+                            $mail->Password   = SMTP_PASSWORD;
+                            $mail->SMTPSecure = SMTP_SECURE;
+                            $mail->Port       = SMTP_PORT;
+
+                            //Recipients
+                            $mail->setFrom(FROM_EMAIL, FROM_NAME);
+                            $mail->addAddress($email);
+
+                            //Content
+                            $mail->isHTML(true);
+                            $mail->Subject = 'Password Reset Request';
+                            $mail->Body    = 'Please click on the following link to reset your password: <a href="' . $reset_link . '">' . $reset_link . '</a>';
+
+                            $mail->send();
+                            $success_message = 'If an account with that email exists, a password reset link has been sent.';
+
+                        } catch (Exception $e) {
+                            $email_err = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
                         }
                     }
                 } else {
-                    $login_err = "Invalid email or password.";
+                    // To prevent user enumeration, show the same success message
+                    $success_message = 'If an account with that email exists, a password reset link has been sent.';
                 }
             } else {
-                $login_err = "Oops! Something went wrong. Please try again later.";
+                $email_err = "Oops! Something went wrong. Please try again later.";
             }
             $stmt->close();
         }
     }
-    // $mysqli->close(); // Connection will be closed at the end of config.php or script execution
 }
 ?>
 <html>
@@ -91,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CN Auto</title>
+    <title>Forgot Password - CN Auto</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
@@ -114,40 +113,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">CN Auto</h2>
             </a>
           </div>
-          <div class="flex flex-1 justify-end gap-2 sm:gap-8">
-            <nav class="hidden sm:flex items-center gap-9">
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/home.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'page' : ''; ?>">Home</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/servizi.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'servizi.php') ? 'page' : ''; ?>">Services</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="#">About</a>
-              <a class="text-white text-sm font-medium leading-normal hover:text-[#f4c653]" href="<?php echo BASE_URL . '/contact.php'; ?>" aria-current="<?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'page' : ''; ?>">Contact</a>
-            </nav>
-            <a href="<?php echo BASE_URL . '/bookinapp.php'; ?>"
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#483e23] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#5a4e2e]"
-            >
-              <span class="truncate">Book Now</span>
-            </a>
-          </div>
         </header>
         <div class="px-4 sm:px-10 md:px-40 flex flex-1 justify-center py-5">
           <div class="layout-content-container flex flex-col w-full sm:w-[512px] max-w-[512px] py-5 flex-1">
-            <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Welcome Back</h2>
+            <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Forgot Password</h2>
 
             <?php
-            if(!empty($login_err)){
-                echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">' . $login_err . '</div>';
+            if(!empty($email_err)){
+                echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">' . $email_err . '</div>';
             }
-            if(isset($_SESSION['success_message'])){
-                echo '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">' . $_SESSION['success_message'] . '</div>';
-                unset($_SESSION['success_message']);
-            }
-            if(isset($_GET['message'])){
-                echo '<div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">' . htmlspecialchars($_GET['message']) . '</div>';
+            if(!empty($success_message)){
+                echo '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">' . $success_message . '</div>';
             }
             ?>
 
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
                   <label class="flex flex-col min-w-40 flex-1">
+                    <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4">Enter your email address and we will send you a link to reset your password.</p>
                     <input
                       type="email"
                       name="email"
@@ -158,30 +141,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <span class="text-red-500 text-xs italic"><?php echo $email_err; ?></span>
                   </label>
                 </div>
-                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                  <label class="flex flex-col min-w-40 flex-1">
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#483e23] focus:border-none h-14 placeholder:text-[#caba91] p-4 text-base font-normal leading-normal <?php echo (!empty($password_err)) ? 'border-red-500' : ''; ?>"
-                    />
-                    <span class="text-red-500 text-xs italic"><?php echo $password_err; ?></span>
-                  </label>
-                </div>
-                <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 underline"><a href="<?php echo BASE_URL . '/forgot_password.php'; ?>">Forgot Password?</a></p>
                 <div class="flex px-4 py-3">
                   <button
                     type="submit"
                     class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-[#f4c653] text-[#221d11] text-base font-bold leading-normal tracking-[0.015em]"
                   >
-                    <span class="truncate">Log In</span>
+                    <span class="truncate">Send Reset Link</span>
                   </button>
                 </div>
             </form>
-            <p class="text-[#caba91] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
-                Don't have an account? <a href="<?php echo BASE_URL . '/createaccount.php'; ?>" class="underline hover:text-[#f4c653]">Sign Up</a>
-            </p>
           </div>
         </main>
         <footer class="flex justify-center border-t border-solid border-t-[#483e23] mt-auto py-5 bg-[#221d11]">
