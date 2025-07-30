@@ -1,12 +1,17 @@
 <?php
 require_once 'config.php';
 require_once 'auth_check.php';
-require_admin(); // Solo gli admin possono inviare comunicazioni
 require_once 'utils/functions.php'; // Per send_email e sanitize_input
 
 $response = ['success' => false, 'message' => '', 'errors' => []];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!is_admin()) {
+        $response['message'] = 'Unauthorized';
+        echo json_encode($response);
+        exit;
+    }
+    verify_csrf_token();
     $user_id = isset($_POST['user_id']) ? (int)$_POST['user_id'] : null;
     $subject = isset($_POST['communication_subject']) ? sanitize_input($_POST['communication_subject']) : '';
     $message_body = isset($_POST['communication_message']) ? sanitize_input($_POST['communication_message']) : ''; // Sanitize, nl2br will be used for HTML email

@@ -7,6 +7,7 @@ require_once 'utils/functions.php'; // For send_email and other utilities
 $response = ['success' => false, 'message' => '', 'errors' => []];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    verify_csrf_token();
     // --- Form Data Collection and Basic Sanitization ---
     $service_id = isset($_POST['service_id']) ? (int)$_POST['service_id'] : null;
     $booking_date = isset($_POST['booking_date']) ? sanitize_input($_POST['booking_date']) : null;

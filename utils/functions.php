@@ -45,11 +45,13 @@ function display_flash_message() {
 function get_all_services($mysqli_conn) {
     $services = [];
     $sql = "SELECT id, name, price, duration FROM services ORDER BY name ASC";
-    if ($result = $mysqli_conn->query($sql)) {
+    if ($stmt = $mysqli_conn->prepare($sql)) {
+        $stmt->execute();
+        $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
             $services[] = $row;
         }
-        $result->free();
+        $stmt->close();
     } else {
         // Handle error, e.g., log it or return an empty array with an error flag
         error_log("Error fetching services: " . $mysqli_conn->error);
@@ -108,6 +110,30 @@ function format_time_display($time_str, $format = "h:i A") {
     } catch (Exception $e) {
         return $time_str;
     }
+}
+
+// CSRF Token Functions
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function csrf_input_field() {
+    $token = generate_csrf_token();
+    return '<input type="hidden" name="csrf_token" value="' . $token . '">';
+}
+
+function verify_csrf_token() {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        // Token is invalid or missing
+        unset($_SESSION['csrf_token']); // Invalidate the token
+        // You can die, redirect, or set an error message
+        die('CSRF token validation failed.');
+    }
+    // Token is valid, unset it to prevent reuse (optional, but good practice for single-use tokens)
+    unset($_SESSION['csrf_token']);
 }
 
 

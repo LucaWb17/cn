@@ -12,6 +12,7 @@ $name_err = $email_err = $password_err = $confirm_password_err = $general_messag
 $message_type = ""; // 'success' or 'error'
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf_token();
     if (isset($_POST['update_profile'])) {
         $new_name = sanitize_input($_POST['name']);
         $new_email = sanitize_input($_POST['email']);
@@ -122,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="bg-[#353017] p-6 rounded-lg shadow">
         <h3 class="text-xl font-semibold text-white mb-4">Update Profile</h3>
         <form method="POST" action="<?php echo BASE_URL . '/areacliente.php?tab=settings'; ?>" class="space-y-4">
+            <?php echo csrf_input_field(); ?>
             <div>
                 <label for="name" class="block text-sm font-medium text-[#cdc28e]">Full Name</label>
                 <input type="text" name="name" id="name" value="<?php echo htmlspecialchars($user_name); ?>" required
@@ -144,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="bg-[#353017] p-6 rounded-lg shadow">
         <h3 class="text-xl font-semibold text-white mb-4">Change Password</h3>
         <form method="POST" action="<?php echo BASE_URL . '/areacliente.php?tab=settings'; ?>" class="space-y-4">
+            <?php echo csrf_input_field(); ?>
             <div>
                 <label for="current_password" class="block text-sm font-medium text-[#cdc28e]">Current Password</label>
                 <input type="password" name="current_password" id="current_password" required

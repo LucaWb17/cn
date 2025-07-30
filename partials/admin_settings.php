@@ -13,6 +13,7 @@
         <div id="adminChangePasswordMessage" class="hidden p-3 mb-4 rounded-md text-sm"></div>
 
         <form id="adminChangePasswordForm" class="space-y-4">
+            <?php echo csrf_input_field(); ?>
             <div>
                 <label for="current_password_admin" class="block text-sm font-medium text-[#cdc28e] mb-1">Current Password</label>
                 <input type="password" name="current_password" id="current_password_admin" required
