@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['action'])) {
 $response = ['success' => false, 'message' => '', 'errors' => []]; // Default per risposte azioni POST
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf_token();
     $action = isset($_POST['action']) ? $_POST['action'] : null;
 
     if ($action === 'update_role') {
@@ -52,8 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             if ($user_id_to_manage === $_SESSION['user_id'] && $new_role === 'user') {
                 $sql_count_admins = "SELECT COUNT(*) as admin_count FROM users WHERE role = 'admin'";
-                $admin_count_result = $mysqli->query($sql_count_admins);
+                $stmt_count = $mysqli->prepare($sql_count_admins);
+                $stmt_count->execute();
+                $admin_count_result = $stmt_count->get_result();
                 $admin_count_row = $admin_count_result->fetch_assoc();
+                $stmt_count->close();
                 if ($admin_count_row && $admin_count_row['admin_count'] <= 1) {
                     $response['message'] = 'Cannot remove admin role from the only administrator.';
                     echo json_encode($response);

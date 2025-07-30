@@ -5,9 +5,11 @@
 
 $all_services = get_all_services($mysqli);
 $all_users = []; // Will be fetched by JS or passed if small number
-$stmt_users = $mysqli->query("SELECT id, name, email FROM users ORDER BY name ASC");
+$stmt_users = $mysqli->prepare("SELECT id, name, email FROM users ORDER BY name ASC");
 if($stmt_users) {
-    while($row = $stmt_users->fetch_assoc()){
+    $stmt_users->execute();
+    $result = $stmt_users->get_result();
+    while($row = $result->fetch_assoc()){
         $all_users[] = $row;
     }
     $stmt_users->close();
@@ -17,6 +19,7 @@ if($stmt_users) {
     <h2 class="text-white text-2xl sm:text-3xl font-bold tracking-tight">Add New Appointment</h2>
 
     <form id="adminAddBookingForm" class="bg-[#353017] p-4 sm:p-6 rounded-lg shadow space-y-6">
+        <?php echo csrf_input_field(); ?>
         <div id="adminBookingFormMessage" class="hidden p-3 rounded-md text-sm"></div>
 
         <!-- Client Information -->

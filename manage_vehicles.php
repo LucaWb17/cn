@@ -11,6 +11,10 @@ if (!is_logged_in()) {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf_token();
+}
+
 $user_id = $_SESSION['user_id']; // Logged-in user's ID
 
 // Determine whose vehicles to fetch. Default to logged-in user.

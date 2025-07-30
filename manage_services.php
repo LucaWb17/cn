@@ -1,10 +1,20 @@
 <?php
 require_once 'config.php';
 require_once 'auth_check.php';
-require_admin(); // Only admins can manage services
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => '', 'data' => []];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (!is_admin()) {
+        $response['message'] = 'Unauthorized';
+        echo json_encode($response);
+        exit;
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        verify_csrf_token();
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Fetch all services

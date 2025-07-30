@@ -46,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 session_start();
                             }
 
+                            session_regenerate_id(true);
+
                             // Store data in session variables
                             $_SESSION["user_id"] = $id;
                             $_SESSION["user_name"] = $name;

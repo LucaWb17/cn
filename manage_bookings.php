@@ -1,12 +1,17 @@
 <?php
 require_once 'config.php';
 require_once 'auth_check.php';
-require_admin(); // Only admins can manage bookings extensively
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => '', 'data' => null];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!is_admin()) {
+        $response['message'] = 'Unauthorized';
+        echo json_encode($response);
+        exit;
+    }
+    verify_csrf_token();
     $action = isset($_POST['action']) ? $_POST['action'] : null;
     $booking_id = isset($_POST['booking_id']) ? (int)$_POST['booking_id'] : null;
 
